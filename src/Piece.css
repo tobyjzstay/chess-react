@@ -1,0 +1,57 @@
+@import url("./Square.css");
+
+.piece {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.piece__white.piece__king {
+    background-image: url("./assets/wK.svg");
+}
+
+.piece__white.piece__queen {
+    background-image: url("./assets/wQ.svg");
+}
+
+.piece__white.piece__rook {
+    background-image: url("./assets/wR.svg");
+}
+
+.piece__white.piece__bishop {
+    background-image: url("./assets/wB.svg");
+}
+
+.piece__white.piece__knight {
+    background-image: url("./assets/wN.svg");
+}
+
+.piece__white.piece__pawn {
+    background-image: url("./assets/wP.svg");
+}
+
+.piece__black.piece__king {
+    background-image: url("./assets/bK.svg");
+}
+
+.piece__black.piece__queen {
+    background-image: url("./assets/bQ.svg");
+}
+
+.piece__black.piece__rook {
+    background-image: url("./assets/bR.svg");
+}
+
+.piece__black.piece__bishop {
+    background-image: url("./assets/bB.svg");
+}
+
+.piece__black.piece__knight {
+    background-image: url("./assets/bN.svg");
+}
+
+.piece__black.piece__pawn {
+    background-image: url("./assets/bP.svg");
+}
