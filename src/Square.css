@@ -1,0 +1,16 @@
+:root {
+    --square-size: calc(max(min(100vw, 100vh) / 10, 25px));
+}
+
+.square {
+    width: var(--square-size);
+    height: var(--square-size);
+}
+
+.square__white {
+    background-color: #f0d9b5;
+}
+
+.square__black {
+    background-color: #b58863;
+}
