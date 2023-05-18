@@ -46,6 +46,10 @@
   color: #f0d9b5;
 }
 
+.square__selected {
+  background-color: rgba(155, 199, 0, .41);
+}
+
 .square .coord__debug {
   top: 0px;
   left: 0;
@@ -55,3 +59,4 @@
   padding-right: 4px;
   color: black;
 }
+
