@@ -1,16 +1,57 @@
 :root {
-    --square-size: calc(max(min(100vw, 100vh) / 10, 25px));
+  --square-size: calc(max(min(100vw, 100vh) / 10, 25px));
 }
 
 .square {
-    width: var(--square-size);
-    height: var(--square-size);
+  width: var(--square-size);
+  height: var(--square-size);
+  position: relative;
 }
 
 .square__white {
-    background-color: #f0d9b5;
+  background-color: #f0d9b5;
 }
 
 .square__black {
-    background-color: #b58863;
+  background-color: #b58863;
+}
+
+.coord {
+  position: absolute;
+  font-size: calc(8px + 4 * ((100vw - 320px) / 880));
+  font-weight: bold;
+  user-select: none;
+}
+
+.coord__file {
+  bottom: 0px;
+  left: 0;
+  text-align: left;
+  width: 100%;
+  padding-left: 4px;
+}
+
+.coord__rank {
+  top: 1px;
+  right: 0;
+  height: 100%;
+  padding-right: 4px;
+}
+
+.square__white .coord {
+  color: #b58863;
+}
+
+.square__black .coord {
+  color: #f0d9b5;
+}
+
+.square .coord__debug {
+  top: 0px;
+  left: 0;
+  font-size: calc(8px + 4 * ((100vw - 320px) / 880));
+  text-align: left;
+  padding-left: 4px;
+  padding-right: 4px;
+  color: black;
 }
