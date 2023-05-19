@@ -8,12 +8,20 @@
     position: relative;
 }
 
-.square__white {
+.square.white {
     background-color: #f0d9b5;
 }
 
-.square__black {
+.square.black {
     background-color: #b58863;
+}
+
+.square.white .coord {
+    color: #b58863;
+}
+
+.square.black .coord {
+    color: #f0d9b5;
 }
 
 .coord {
@@ -23,7 +31,7 @@
     user-select: none;
 }
 
-.coord__file {
+.coord.file {
     bottom: 0px;
     left: 0;
     text-align: left;
@@ -31,31 +39,42 @@
     padding-left: 4px;
 }
 
-.coord__rank {
+.coord.rank {
     top: 1px;
     right: 0;
     height: 100%;
     padding-right: 4px;
 }
 
-.square__white .coord {
-    color: #b58863;
+.coord.debug {
+    top: 0px;
+    left: 0;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
-.square__black .coord {
-    color: #f0d9b5;
-}
-
-.square__selected {
+.square.previous {
     background-color: rgba(155, 199, 0, 0.41);
 }
 
-.square .coord__debug {
-    top: 0px;
-    left: 0;
-    font-size: calc(8px + 4 * ((100vw - 320px) / 880));
-    text-align: left;
-    padding-left: 4px;
-    padding-right: 4px;
-    color: black;
+.square.destination {
+    background: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
+}
+
+.square.selected {
+    background-color: rgba(20, 85, 30, 0.5);
+}
+
+.square.capture {
+    background: radial-gradient(transparent 0%, transparent 79%, rgba(20, 85, 0, 0.3) 80%);
+}
+
+.square.check {
+    background: radial-gradient(
+        ellipse at center,
+        rgb(255, 0, 0) 0%,
+        rgb(231, 0, 0) 25%,
+        rgba(169, 0, 0, 0) 89%,
+        rgba(158, 0, 0, 0) 100%
+    );
 }

@@ -29,21 +29,17 @@ export type Position = [number, number];
 function Piece() {
     const { squares } = React.useContext(BoardContext);
     const { file, rank } = React.useContext(SquareContext);
-    const piece = squares[file][rank].piece;
+    const square = squares[file][rank];
+    const piece = square.piece;
 
     let className = "piece";
 
-    function handleMouseEnter() {
+    function handleClick() {
+        const isSelected = square.isSelected;
+        square.setSelected(!isSelected);
         const moves = legalMoves(squares, file, rank);
         moves.forEach(([file, rank]) => {
-            squares[file][rank].highlight(true);
-        });
-    }
-
-    function handleMouseLeave() {
-        const moves = legalMoves(squares, file, rank);
-        moves.forEach(([file, rank]) => {
-            squares[file][rank].highlight(false);
+            squares[file][rank].setDestination(!isSelected);
         });
     }
 
@@ -81,7 +77,7 @@ function Piece() {
             return null;
     }
 
-    return <div className={className} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}></div>;
+    return <div className={className} onClick={handleClick}></div>;
 }
 
 function legalMoves(squares: SquareData[][], file: number, rank: number) {

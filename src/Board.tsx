@@ -74,6 +74,7 @@ function parsePiece(piece: string): PieceData[] {
         case "P":
             return [{ type: Type.Pawn, colour: Colour.White }];
         default:
+            // eslint-disable-next-line no-case-declarations
             const number = parseInt(piece);
             if (isNaN(number)) throw new Error("Invalid FEN");
             return Array.from({ length: number }, () => ({
