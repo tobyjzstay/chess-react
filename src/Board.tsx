@@ -1,10 +1,10 @@
 import React from "react";
-import useForceUpdate from "use-force-update";
 import "./Board.css";
 import { Colour, PieceData, Type } from "./Piece";
 import Square, { SquareData } from "./Square";
 
-const FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+const FEN = "rnbqkbnr/pppppppp/4k3/8/8/8/PPPPPPPP/RNBQKBNR";
+const FEN_PUZZLE = "8/1pk5/pb4p1/4p3/1PN1P1p1/2PQ2Pq/P5K1/R7";
 export const RANKS = 8;
 export const FILES = 8;
 
@@ -15,8 +15,7 @@ type BoardData = {
 export const BoardContext = React.createContext<BoardData>(Object.create(null));
 
 function Board() {
-    const forceUpdate = useForceUpdate();
-    const files = FEN.split("/");
+    const files = FEN_PUZZLE.split("/");
     const fenBoard = files.map((rank) => rank.split(""));
     const pieces = fenBoard.map((rank) => rank.flatMap(parsePiece));
 

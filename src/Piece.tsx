@@ -88,13 +88,13 @@ function legalMoves(squares: SquareData[][], file: number, rank: number) {
     const piece = squares[file][rank].piece;
     switch (piece.type) {
         case Type.King:
-            break;
+            return kingMoves(squares, file, rank);
         case Type.Queen:
             return queenMoves(squares, file, rank);
         case Type.Rook:
-            break;
+            return rookMoves(squares, file, rank);
         case Type.Bishop:
-            break;
+            return bishopMoves(squares, file, rank);
         case Type.Knight:
             return knightMoves(squares, file, rank);
         case Type.Pawn:
@@ -104,6 +104,33 @@ function legalMoves(squares: SquareData[][], file: number, rank: number) {
     }
 
     return [];
+}
+
+function kingMoves(squares: SquareData[][], file: number, rank: number) {
+    const piece = squares[file][rank].piece;
+    const moves: Position[] = [];
+
+    const KING_MOVES: Position[] = [
+        [-1, 0],
+        [-1, 1],
+        [0, 1],
+        [1, 1],
+        [1, 0],
+        [1, -1],
+        [0, -1],
+        [-1, -1],
+    ];
+
+    for (const move of KING_MOVES) {
+        const newFile = file + move[0];
+        const newRank = rank + move[1];
+        if (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
+            if (squares[newFile][newRank].piece.colour === piece.colour) continue;
+            moves.push([newFile, newRank]);
+        }
+    }
+
+    return moves;
 }
 
 function queenMoves(squares: SquareData[][], file: number, rank: number) {
@@ -118,6 +145,58 @@ function queenMoves(squares: SquareData[][], file: number, rank: number) {
         [1, 0],
         [1, -1],
         [0, -1],
+        [-1, -1],
+    ];
+
+    for (const move of QUEEN_MOVES) {
+        let newFile = file + move[0];
+        let newRank = rank + move[1];
+        while (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
+            if (squares[newFile][newRank].piece.colour === piece.colour) break;
+            moves.push([newFile, newRank]);
+            if (squares[newFile][newRank].piece.colour !== Colour.None) break;
+            newFile += move[0];
+            newRank += move[1];
+        }
+    }
+
+    return moves;
+}
+
+function rookMoves(squares: SquareData[][], file: number, rank: number) {
+    const piece = squares[file][rank].piece;
+    const moves: Position[] = [];
+
+    const ROOK_MOVES: Position[] = [
+        [-1, 0],
+        [0, 1],
+        [1, 0],
+        [0, -1],
+    ];
+
+    for (const move of ROOK_MOVES) {
+        let newFile = file + move[0];
+        let newRank = rank + move[1];
+        while (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
+            if (squares[newFile][newRank].piece.colour === piece.colour) break;
+            moves.push([newFile, newRank]);
+            if (squares[newFile][newRank].piece.colour !== Colour.None) break;
+            newFile += move[0];
+            newRank += move[1];
+        }
+    }
+
+    return moves;
+}
+
+function bishopMoves(squares: SquareData[][], file: number, rank: number) {
+    const piece = squares[file][rank].piece;
+    const moves: Position[] = [];
+
+    const QUEEN_MOVES: Position[] = [
+        [-1, 1],
+        [1, 1],
+        [1, -1],
         [-1, -1],
     ];
 
