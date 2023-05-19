@@ -110,18 +110,7 @@ function kingMoves(squares: SquareData[][], file: number, rank: number) {
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
-    const KING_MOVES: Position[] = [
-        [-1, 0],
-        [-1, 1],
-        [0, 1],
-        [1, 1],
-        [1, 0],
-        [1, -1],
-        [0, -1],
-        [-1, -1],
-    ];
-
-    for (const move of KING_MOVES) {
+    for (const move of KING_DIRECTIONS) {
         const newFile = file + move[0];
         const newRank = rank + move[1];
         if (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
@@ -137,18 +126,7 @@ function queenMoves(squares: SquareData[][], file: number, rank: number) {
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
-    const QUEEN_MOVES: Position[] = [
-        [-1, 0],
-        [-1, 1],
-        [0, 1],
-        [1, 1],
-        [1, 0],
-        [1, -1],
-        [0, -1],
-        [-1, -1],
-    ];
-
-    for (const move of QUEEN_MOVES) {
+    for (const move of QUEEN_DIRECTIONS) {
         let newFile = file + move[0];
         let newRank = rank + move[1];
         while (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
@@ -167,14 +145,7 @@ function rookMoves(squares: SquareData[][], file: number, rank: number) {
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
-    const ROOK_MOVES: Position[] = [
-        [-1, 0],
-        [0, 1],
-        [1, 0],
-        [0, -1],
-    ];
-
-    for (const move of ROOK_MOVES) {
+    for (const move of ROOK_DIRECTIONS) {
         let newFile = file + move[0];
         let newRank = rank + move[1];
         while (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
@@ -193,14 +164,7 @@ function bishopMoves(squares: SquareData[][], file: number, rank: number) {
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
-    const QUEEN_MOVES: Position[] = [
-        [-1, 1],
-        [1, 1],
-        [1, -1],
-        [-1, -1],
-    ];
-
-    for (const move of QUEEN_MOVES) {
+    for (const move of BISHOP_DIRECTIONS) {
         let newFile = file + move[0];
         let newRank = rank + move[1];
         while (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
@@ -219,18 +183,7 @@ function knightMoves(squares: SquareData[][], file: number, rank: number) {
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
-    const KNIGHT_MOVES: Position[] = [
-        [-2, 1],
-        [-1, 2],
-        [1, 2],
-        [2, 1],
-        [2, -1],
-        [1, -2],
-        [-1, -2],
-        [-2, -1],
-    ];
-
-    for (const move of KNIGHT_MOVES) {
+    for (const move of KNIGHT_DIRECTIONS) {
         const newFile = file + move[0];
         const newRank = rank + move[1];
         if (newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS) continue;
@@ -240,5 +193,34 @@ function knightMoves(squares: SquareData[][], file: number, rank: number) {
 
     return moves;
 }
+
+const KNIGHT_DIRECTIONS: Position[] = [
+    [-2, 1],
+    [-1, 2],
+    [1, 2],
+    [2, 1],
+    [2, -1],
+    [1, -2],
+    [-1, -2],
+    [-2, -1],
+];
+
+const BISHOP_DIRECTIONS: Position[] = [
+    [-1, 1],
+    [1, 1],
+    [1, -1],
+    [-1, -1],
+];
+
+const ROOK_DIRECTIONS: Position[] = [
+    [-1, 0],
+    [0, 1],
+    [1, 0],
+    [0, -1],
+];
+
+const QUEEN_DIRECTIONS: Position[] = [...BISHOP_DIRECTIONS, ...ROOK_DIRECTIONS];
+
+const KING_DIRECTIONS: Position[] = QUEEN_DIRECTIONS;
 
 export default Piece;
