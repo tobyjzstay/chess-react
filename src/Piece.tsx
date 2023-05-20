@@ -95,7 +95,7 @@ function legalMoves(squares: SquareData[][], file: number, rank: number) {
         case Type.Knight:
             return knightMoves(squares, file, rank);
         case Type.Pawn:
-            break;
+            return pawnMoves(squares, file, rank);
         default:
             break;
     }
@@ -190,6 +190,68 @@ function knightMoves(squares: SquareData[][], file: number, rank: number) {
 
     return moves;
 }
+
+function pawnMoves(squares: SquareData[][], file: number, rank: number) {
+    const piece = squares[file][rank].piece;
+    const moves: Position[] = [];
+
+    let direction;
+    // direction is inverted as board origin is top left
+    switch (piece.colour) {
+        case Colour.White:
+            direction = -1;
+            break;
+        case Colour.Black:
+            direction = 1;
+            break;
+        default:
+            return [];
+    }
+
+    for (const index in PAWN_DIRECTIONS) {
+        const move = PAWN_DIRECTIONS[index];
+
+        const newFile = file + move[0] * direction;
+        const newRank = rank + move[1] * direction;
+
+        if (newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS) continue;
+
+        switch (index) {
+            // move
+            case "0":
+                if (squares[newFile][newRank].piece.colour !== Colour.None) continue;
+                break;
+            // start move
+            case "1":
+                if (file !== 1 && file !== 6) continue;
+                else if (moves.length === 0) continue; // if the first move is blocked, the second move is also blocked
+                else if (squares[newFile][newRank].piece.colour !== Colour.None) continue;
+                break;
+            // capture
+            case "2":
+            case "3":
+                // eslint-disable-next-line no-case-declarations
+                const colour = squares[newFile][newRank].piece.colour;
+                if (colour === Colour.None) continue;
+                else if (colour === piece.colour) continue;
+                break;
+            default:
+                break;
+        }
+
+        if (squares[newFile][newRank].piece.colour === piece.colour) continue;
+        moves.push([newFile, newRank]);
+    }
+
+    return moves;
+}
+
+const PAWN_DIRECTIONS: Position[] = [
+    [1, 0],
+    [2, 0],
+    [1, 1],
+    [1, -1],
+];
 
 const KNIGHT_DIRECTIONS: Position[] = [
     [-2, 1],
