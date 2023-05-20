@@ -55,9 +55,20 @@ function Square({ file, rank }: { file: number; rank: number }) {
         if (piece.type !== Type.None) moveClassName += " capture";
     }
 
+    function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        if (destination) return;
+        for (let f = 0; f < FILES; f++) {
+            for (let r = 0; r < RANKS; r++) {
+                squares[f][r].setSelected(false);
+                squares[f][r].setDestination(false);
+            }
+        }
+        event.stopPropagation();
+    }
+
     return (
         <SquareContext.Provider value={{ file, rank }}>
-            <div className={squareClassName}>
+            <div className={squareClassName} onClick={handleClick}>
                 <div className={moveClassName}>
                     {/* <p className="coord debug">{"[" + file + ", " + rank + "]"}</p> */}
                     {FILES - 1 === file && (
