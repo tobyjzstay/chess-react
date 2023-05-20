@@ -27,7 +27,7 @@ export enum Colour {
 export type Position = [number, number];
 
 function Piece() {
-    const { squares } = React.useContext(BoardContext);
+    const { squares, turn } = React.useContext(BoardContext);
     const { file, rank } = React.useContext(SquareContext);
     const square = squares[file][rank];
     const piece = square.piece;
@@ -35,6 +35,7 @@ function Piece() {
     let className = "piece";
 
     function handleClick() {
+        if (piece.colour !== turn) return;
         const isSelected = square.isSelected;
         square.setSelected(!isSelected);
         const moves = legalMoves(squares, file, rank);
