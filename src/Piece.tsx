@@ -137,9 +137,9 @@ function isKingInCheck(
 
     for (let f = 0; f < FILES; f++) {
         for (let r = 0; r < RANKS; r++) {
-            const piece = newSquares[f][r].piece;
-            if (piece.type === Type.King && piece.colour === piece.colour) {
-                return isSquareAttacked(newSquares, f, r, piece.colour);
+            const p = newSquares[f][r].piece;
+            if (p.colour === piece.colour && p.type === Type.King) {
+                if (isSquareAttacked(newSquares, f, r, p.colour)) return true;
             }
         }
     }
@@ -147,7 +147,7 @@ function isKingInCheck(
     return false;
 }
 
-function isSquareAttacked(squares: SquareData[][], file: number, rank: number, colour: Colour) {
+export function isSquareAttacked(squares: SquareData[][], file: number, rank: number, colour: Colour) {
     for (let f = 0; f < FILES; f++) {
         for (let r = 0; r < RANKS; r++) {
             const piece = squares[f][r].piece;

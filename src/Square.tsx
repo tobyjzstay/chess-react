@@ -1,6 +1,6 @@
 import React from "react";
 import { BoardContext, FILES, RANKS } from "./Board";
-import Piece, { PieceData, Type } from "./Piece";
+import Piece, { PieceData, Type, isSquareAttacked } from "./Piece";
 import "./Square.css";
 
 export type SquareData = {
@@ -19,7 +19,7 @@ export const SquareContext = React.createContext<{
 }>(Object.create(null));
 
 function Square({ file, rank }: { file: number; rank: number }) {
-    const { squares } = React.useContext(BoardContext);
+    const { squares, turn } = React.useContext(BoardContext);
     const piece = squares[file][rank].piece;
 
     const [destination, setDestination] = React.useState(false);
@@ -54,6 +54,9 @@ function Square({ file, rank }: { file: number; rank: number }) {
         moveClassName += " destination";
         if (piece.type !== Type.None) moveClassName += " capture";
     }
+
+    if (turn === piece.colour && piece.type === Type.King && isSquareAttacked(squares, file, rank, piece.colour))
+        moveClassName += " check";
 
     function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
         if (destination) return;
