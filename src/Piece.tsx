@@ -1,11 +1,11 @@
 import React from "react";
-import { BoardContext, FILES, RANKS } from "./Board";
+import { BoardContext, Colour, FILES, RANKS } from "./Board";
 import "./Piece.css";
 import { SquareContext, SquareData } from "./Square";
 
 export type PieceData = {
-    type: Type;
     colour: Colour;
+    type: Type;
 };
 
 export enum Type {
@@ -18,12 +18,6 @@ export enum Type {
     Pawn = 6,
 }
 
-export enum Colour {
-    None = 0,
-    White = 1,
-    Black = 2,
-}
-
 export type Position = [number, number];
 
 function Piece() {
@@ -34,35 +28,35 @@ function Piece() {
 
     let className = "piece";
 
-    switch (piece.type) {
-        case Type.King:
-            className += " piece__king";
+    switch (piece.colour) {
+        case Colour.White:
+            className += " white";
             break;
-        case Type.Queen:
-            className += " piece__queen";
-            break;
-        case Type.Rook:
-            className += " piece__rook";
-            break;
-        case Type.Bishop:
-            className += " piece__bishop";
-            break;
-        case Type.Knight:
-            className += " piece__knight";
-            break;
-        case Type.Pawn:
-            className += " piece__pawn";
+        case Colour.Black:
+            className += " black";
             break;
         default:
             return null;
     }
 
-    switch (piece.colour) {
-        case Colour.White:
-            className += " piece__white";
+    switch (piece.type) {
+        case Type.King:
+            className += " king";
             break;
-        case Colour.Black:
-            className += " piece__black";
+        case Type.Queen:
+            className += " queen";
+            break;
+        case Type.Rook:
+            className += " rook";
+            break;
+        case Type.Bishop:
+            className += " bishop";
+            break;
+        case Type.Knight:
+            className += " knight";
+            break;
+        case Type.Pawn:
+            className += " pawn";
             break;
         default:
             return null;

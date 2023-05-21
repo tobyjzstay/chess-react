@@ -2,7 +2,7 @@
     --square-size: calc(max(min(100vw, 100vh) / 10, 25px));
 }
 
-.square {
+.square .overlay {
     width: var(--square-size);
     height: var(--square-size);
     position: relative;
@@ -53,27 +53,27 @@
     padding-right: 4px;
 }
 
-.square.previous {
+.overlay.previous {
     background-color: rgba(155, 199, 0, 0.41);
 }
 
-.square.destination {
+.overlay.destination {
     background: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
 }
 
-.square.destination:hover {
+.overlay.destination:hover {
     background: rgba(20, 85, 30, 0.3);
 }
 
-.square.selected {
+.overlay.selected {
     background-color: rgba(20, 85, 30, 0.5);
 }
 
-.square.capture {
+.overlay.capture {
     background: radial-gradient(transparent 0%, transparent 79%, rgba(20, 85, 0, 0.3) 80%);
 }
 
-.square.check {
+.overlay.check {
     background: radial-gradient(
         ellipse at center,
         rgb(255, 0, 0) 0%,

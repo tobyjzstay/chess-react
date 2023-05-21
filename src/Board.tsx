@@ -1,6 +1,6 @@
 import React from "react";
 import "./Board.css";
-import { Colour, PieceData, Type } from "./Piece";
+import { PieceData, Type } from "./Piece";
 import Square, { SquareData } from "./Square";
 
 const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -8,6 +8,12 @@ const puzzleFen = "r1b2r1k/4qp1p/p1Nppb1Q/4nP2/1p2P3/2N5/PPP4P/2KR1BR1 b - - 5 1
 
 export const RANKS = 8;
 export const FILES = 8;
+
+export enum Colour {
+    None = 0,
+    White = 1,
+    Black = 2,
+}
 
 type BoardData = {
     squares: SquareData[][];
@@ -26,15 +32,13 @@ function Board() {
     return (
         <BoardContext.Provider value={boardData}>
             <div className="board">
-                <div className="file">
-                    {Array.from({ length: FILES }, (_, file) => (
-                        <div key={file} className="rank">
-                            {Array.from({ length: RANKS }, (_, rank) => (
-                                <Square key={rank} file={file} rank={rank} />
-                            ))}
-                        </div>
-                    ))}
-                </div>
+                {Array.from({ length: FILES }, (_, file) => (
+                    <div key={file} className="rank">
+                        {Array.from({ length: RANKS }, (_, rank) => (
+                            <Square key={rank} file={file} rank={rank} />
+                        ))}
+                    </div>
+                ))}
             </div>
         </BoardContext.Provider>
     );

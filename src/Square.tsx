@@ -25,10 +25,6 @@ function Square({ file, rank }: { file: number; rank: number }) {
     const [destination, setDestination] = React.useState(false);
     const [selected, setSelected] = React.useState(false);
 
-    const baseClassName = "square";
-    let squareClassName = baseClassName;
-    let moveClassName = baseClassName;
-
     squares[file][rank].isDestination = destination;
     squares[file][rank].setDestination = setDestination;
 
@@ -45,18 +41,22 @@ function Square({ file, rank }: { file: number; rank: number }) {
         setSelected(value);
     };
 
+    let squareClassName = "square";
+
     if (rank % 2 === file % 2) squareClassName += " white";
     else squareClassName += " black";
 
-    if (selected) moveClassName += " selected previous";
+    let overlayClassName = "overlay";
+
+    if (selected) overlayClassName += " selected";
 
     if (destination) {
-        moveClassName += " destination";
-        if (piece.type !== Type.None) moveClassName += " capture";
+        overlayClassName += " destination";
+        if (piece.type !== Type.None) overlayClassName += " capture";
     }
 
     if (turn === piece.colour && piece.type === Type.King && isSquareAttacked(squares, file, rank, piece.colour))
-        moveClassName += " check";
+        overlayClassName += " check";
 
     function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
         if (destination) return;
@@ -72,8 +72,7 @@ function Square({ file, rank }: { file: number; rank: number }) {
     return (
         <SquareContext.Provider value={{ file, rank }}>
             <div className={squareClassName} onClick={handleClick}>
-                <div className={moveClassName}>
-                    {/* <p className="coord debug">{"[" + file + ", " + rank + "]"}</p> */}
+                <div className={overlayClassName}>
                     {FILES - 1 === file && (
                         <p className="coord file">{String.fromCharCode("a".charCodeAt(0) + rank)}</p>
                     )}

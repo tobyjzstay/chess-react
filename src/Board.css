@@ -1,13 +1,10 @@
 .board {
+    display: flex;
+    flex-direction: column;
     cursor: pointer;
 }
 
 .rank {
     display: flex;
     flex-direction: row;
-}
-
-.file {
-    display: flex;
-    flex-direction: column;
 }
