@@ -19,7 +19,8 @@ export const SquareContext = React.createContext<{
 }>(Object.create(null));
 
 function Square({ file, rank }: { file: number; rank: number }) {
-    const { squares, turn } = React.useContext(BoardContext);
+    const boardData = React.useContext(BoardContext);
+    const { squares, turn } = boardData;
     const piece = squares[file][rank].piece;
 
     const [destination, setDestination] = React.useState(false);
@@ -31,8 +32,8 @@ function Square({ file, rank }: { file: number; rank: number }) {
     squares[file][rank].isSelected = selected;
     squares[file][rank].setSelected = (value: boolean) => {
         if (value)
-            for (let f = 0; f < FILES; f++) {
-                for (let r = 0; r < RANKS; r++) {
+            for (let r = 0; r < RANKS; r++) {
+                for (let f = 0; f < FILES; f++) {
                     if (f === file && r === rank) continue;
                     squares[f][r].setSelected(false);
                     squares[f][r].setDestination(false);
@@ -55,15 +56,15 @@ function Square({ file, rank }: { file: number; rank: number }) {
         if (piece.type !== Type.None) overlayClassName += " capture";
     }
 
-    if (turn === piece.colour && piece.type === Type.King && isSquareAttacked(squares, file, rank, piece.colour))
+    if (turn === piece.colour && piece.type === Type.King && isSquareAttacked(boardData, file, rank, piece.colour))
         overlayClassName += " check";
 
     function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
         if (destination) return;
-        for (let f = 0; f < FILES; f++) {
-            for (let r = 0; r < RANKS; r++) {
-                squares[f][r].setSelected(false);
-                squares[f][r].setDestination(false);
+        for (let rank = 0; rank < RANKS; rank++) {
+            for (let file = 0; file < FILES; file++) {
+                squares[file][rank].setSelected(false);
+                squares[file][rank].setDestination(false);
             }
         }
         event.stopPropagation();
@@ -73,10 +74,11 @@ function Square({ file, rank }: { file: number; rank: number }) {
         <SquareContext.Provider value={{ file, rank }}>
             <div className={squareClassName} onClick={handleClick}>
                 <div className={overlayClassName}>
-                    {FILES - 1 === file && (
-                        <p className="coord file">{String.fromCharCode("a".charCodeAt(0) + rank)}</p>
+                    <p className="coord debug">{"[file:" + file + ", rank:" + rank + "]"}</p>
+                    {RANKS - 1 === rank && (
+                        <p className="coord file">{String.fromCharCode("a".charCodeAt(0) + file)}</p>
                     )}
-                    {RANKS - 1 === rank && <p className="coord rank">{FILES - file}</p>}
+                    {FILES - 1 === file && <p className="coord rank">{RANKS - rank}</p>}
                     <Piece />
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import "./Board.css";
-import { PieceData, Type } from "./Piece";
+import { PieceData, Position, Type } from "./Piece";
 import Square, { SquareData } from "./Square";
 
 const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -15,11 +15,11 @@ export enum Colour {
     Black = 2,
 }
 
-type BoardData = {
+export type BoardData = {
     squares: SquareData[][];
     turn: Colour;
     castling: string;
-    enPassant: string;
+    enPassant: Position | null;
     halfMove: number;
     fullMove: number;
 };
@@ -32,10 +32,10 @@ function Board() {
     return (
         <BoardContext.Provider value={boardData}>
             <div className="board">
-                {Array.from({ length: FILES }, (_, file) => (
-                    <div key={file} className="rank">
-                        {Array.from({ length: RANKS }, (_, rank) => (
-                            <Square key={rank} file={file} rank={rank} />
+                {Array.from({ length: RANKS }, (_, rank) => (
+                    <div key={rank} className="rank">
+                        {Array.from({ length: FILES }, (_, file) => (
+                            <Square key={file} file={file} rank={rank} />
                         ))}
                     </div>
                 ))}
@@ -59,20 +59,25 @@ function parseFen(fen: string): BoardData {
 }
 
 function parsePieceData(pieceData: string): SquareData[][] {
-    const files = pieceData.split("/");
-    const filePieces = files.map((rank) => rank.split(""));
-    const pieces = filePieces.map((rank) => rank.flatMap(parsePiece));
+    const ranks = pieceData.split("/");
+    const rankPieces = ranks.map((rank) => rank.split(""));
+    const pieces = rankPieces.map((piece) => piece.flatMap(parsePiece));
 
-    return pieces.map((filePieces, f) =>
-        filePieces.map(
-            (piece, r) =>
-                ({
-                    file: f,
-                    rank: r,
-                    piece,
-                } as SquareData)
-        )
-    );
+    const squares: SquareData[][] = [];
+
+    for (let rank = 0; rank < RANKS; rank++) {
+        const row: SquareData[] = [];
+        for (let file = 0; file < FILES; file++) {
+            row.push({
+                file,
+                rank,
+                piece: pieces[file][rank] || { type: Type.None, colour: Colour.None },
+            } as SquareData);
+        }
+        squares.push(row);
+    }
+
+    return squares;
 }
 
 function parsePiece(piece: string): PieceData[] {
@@ -127,8 +132,16 @@ function parseCastling(castling: string): string {
     return castling;
 }
 
-function parseEnPassant(enPassant: string): string {
-    return enPassant;
+function parseEnPassant(enPassant: string): Position | null {
+    if (enPassant === "-") return null;
+    const regex = /^[a-h][1-8]$/;
+    if (!regex.test(enPassant)) throw new Error("Invalid FEN");
+
+    const [file, rank] = enPassant.split("");
+    const fileIndex = file.charCodeAt(0) - "a".charCodeAt(0);
+    const rankIndex = RANKS - parseInt(rank);
+
+    return [fileIndex, rankIndex];
 }
 
 function parseHalfMove(halfMove: string): number {

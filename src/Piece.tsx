@@ -1,7 +1,7 @@
 import React from "react";
-import { BoardContext, Colour, FILES, RANKS } from "./Board";
+import { BoardContext, BoardData, Colour, FILES, RANKS } from "./Board";
 import "./Piece.css";
-import { SquareContext, SquareData } from "./Square";
+import { SquareContext } from "./Square";
 
 export type PieceData = {
     colour: Colour;
@@ -18,11 +18,13 @@ export enum Type {
     Pawn = 6,
 }
 
-export type Position = [number, number];
+export type Position = [number, number]; // [file, rank]
 
 function Piece() {
-    const { squares, turn } = React.useContext(BoardContext);
+    const boardData = React.useContext(BoardContext);
+    const { squares, turn } = boardData;
     const { file, rank } = React.useContext(SquareContext);
+
     const square = squares[file][rank];
     const piece = square.piece;
 
@@ -66,7 +68,7 @@ function Piece() {
         if (piece.colour !== turn) return;
         const isSelected = square.isSelected;
         square.setSelected(!isSelected);
-        const moves = legalMoves(squares, file, rank, false);
+        const moves = legalMoves(boardData, file, rank, false);
         moves.forEach(([file, rank]) => {
             squares[file][rank].setDestination(!isSelected);
         });
@@ -76,21 +78,22 @@ function Piece() {
     return <div className={className} onClick={handleClick}></div>;
 }
 
-function legalMoves(squares: SquareData[][], file: number, rank: number, pseudo: boolean) {
+function legalMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
+    const { squares } = boardData;
     const piece = squares[file][rank].piece;
     switch (piece.type) {
         case Type.King:
-            return kingMoves(squares, file, rank, pseudo);
+            return kingMoves(boardData, file, rank, pseudo);
         case Type.Queen:
-            return queenMoves(squares, file, rank, pseudo);
+            return queenMoves(boardData, file, rank, pseudo);
         case Type.Rook:
-            return rookMoves(squares, file, rank, pseudo);
+            return rookMoves(boardData, file, rank, pseudo);
         case Type.Bishop:
-            return bishopMoves(squares, file, rank, pseudo);
+            return bishopMoves(boardData, file, rank, pseudo);
         case Type.Knight:
-            return knightMoves(squares, file, rank, pseudo);
+            return knightMoves(boardData, file, rank, pseudo);
         case Type.Pawn:
-            return pawnMoves(squares, file, rank, pseudo);
+            return pawnMoves(boardData, file, rank, pseudo);
         default:
             break;
     }
@@ -98,7 +101,8 @@ function legalMoves(squares: SquareData[][], file: number, rank: number, pseudo:
     return [];
 }
 
-function kingMoves(squares: SquareData[][], file: number, rank: number, pseudo: boolean) {
+function kingMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
+    const { squares } = boardData;
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
@@ -107,7 +111,7 @@ function kingMoves(squares: SquareData[][], file: number, rank: number, pseudo: 
         const newRank = rank + move[1];
         if (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
             if (squares[newFile][newRank].piece.colour === piece.colour) continue;
-            else if (!pseudo && isKingInCheck(squares, file, rank, piece, newFile, newRank)) continue;
+            else if (!pseudo && isKingInCheck(boardData, file, rank, piece, newFile, newRank)) continue;
             moves.push([newFile, newRank]);
         }
     }
@@ -116,24 +120,24 @@ function kingMoves(squares: SquareData[][], file: number, rank: number, pseudo: 
 }
 
 function isKingInCheck(
-    squares: SquareData[][],
+    boardData: BoardData,
     file: number,
     rank: number,
     piece: PieceData,
     newFile: number,
     newRank: number
 ) {
-    // copy squares
+    const { squares } = boardData;
     const newSquares = squares.map((row) => row.map((square) => ({ ...square })));
 
     newSquares[file][rank].piece = { type: Type.None, colour: Colour.None };
     newSquares[newFile][newRank].piece = piece;
 
-    for (let f = 0; f < FILES; f++) {
-        for (let r = 0; r < RANKS; r++) {
+    for (let r = 0; r < RANKS; r++) {
+        for (let f = 0; f < FILES; f++) {
             const p = newSquares[f][r].piece;
             if (p.colour === piece.colour && p.type === Type.King) {
-                if (isSquareAttacked(newSquares, f, r, p.colour)) return true;
+                if (isSquareAttacked(boardData, f, r, p.colour)) return true;
             }
         }
     }
@@ -141,12 +145,13 @@ function isKingInCheck(
     return false;
 }
 
-export function isSquareAttacked(squares: SquareData[][], file: number, rank: number, colour: Colour) {
-    for (let f = 0; f < FILES; f++) {
-        for (let r = 0; r < RANKS; r++) {
+export function isSquareAttacked(boardData: BoardData, file: number, rank: number, colour: Colour) {
+    const { squares } = boardData;
+    for (let r = 0; r < RANKS; r++) {
+        for (let f = 0; f < FILES; f++) {
             const piece = squares[f][r].piece;
             if (piece.colour === colour) continue;
-            const moves = legalMoves(squares, f, r, true);
+            const moves = legalMoves(boardData, f, r, true);
             for (const move of moves) {
                 if (move[0] === file && move[1] === rank) return true;
             }
@@ -156,7 +161,8 @@ export function isSquareAttacked(squares: SquareData[][], file: number, rank: nu
     return false;
 }
 
-function queenMoves(squares: SquareData[][], file: number, rank: number, pseudo: boolean) {
+function queenMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
+    const { squares } = boardData;
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
@@ -165,7 +171,7 @@ function queenMoves(squares: SquareData[][], file: number, rank: number, pseudo:
         let newRank = rank + move[1];
         while (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
             if (squares[newFile][newRank].piece.colour === piece.colour) break;
-            else if (!pseudo && isKingInCheck(squares, file, rank, piece, newFile, newRank)) break;
+            else if (!pseudo && isKingInCheck(boardData, file, rank, piece, newFile, newRank)) break;
             moves.push([newFile, newRank]);
             if (squares[newFile][newRank].piece.colour !== Colour.None) break;
             newFile += move[0];
@@ -176,7 +182,8 @@ function queenMoves(squares: SquareData[][], file: number, rank: number, pseudo:
     return moves;
 }
 
-function rookMoves(squares: SquareData[][], file: number, rank: number, pseudo: boolean) {
+function rookMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
+    const { squares } = boardData;
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
@@ -185,7 +192,7 @@ function rookMoves(squares: SquareData[][], file: number, rank: number, pseudo: 
         let newRank = rank + move[1];
         while (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
             if (squares[newFile][newRank].piece.colour === piece.colour) break;
-            else if (!pseudo && isKingInCheck(squares, file, rank, piece, newFile, newRank)) break;
+            else if (!pseudo && isKingInCheck(boardData, file, rank, piece, newFile, newRank)) break;
             moves.push([newFile, newRank]);
             if (squares[newFile][newRank].piece.colour !== Colour.None) break;
             newFile += move[0];
@@ -196,7 +203,8 @@ function rookMoves(squares: SquareData[][], file: number, rank: number, pseudo: 
     return moves;
 }
 
-function bishopMoves(squares: SquareData[][], file: number, rank: number, pseudo: boolean) {
+function bishopMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
+    const { squares } = boardData;
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
@@ -205,7 +213,7 @@ function bishopMoves(squares: SquareData[][], file: number, rank: number, pseudo
         let newRank = rank + move[1];
         while (!(newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS)) {
             if (squares[newFile][newRank].piece.colour === piece.colour) break;
-            else if (!pseudo && isKingInCheck(squares, file, rank, piece, newFile, newRank)) break;
+            else if (!pseudo && isKingInCheck(boardData, file, rank, piece, newFile, newRank)) break;
             moves.push([newFile, newRank]);
             if (squares[newFile][newRank].piece.colour !== Colour.None) break;
             newFile += move[0];
@@ -216,7 +224,8 @@ function bishopMoves(squares: SquareData[][], file: number, rank: number, pseudo
     return moves;
 }
 
-function knightMoves(squares: SquareData[][], file: number, rank: number, pseudo: boolean) {
+function knightMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
+    const { squares } = boardData;
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
@@ -225,14 +234,15 @@ function knightMoves(squares: SquareData[][], file: number, rank: number, pseudo
         const newRank = rank + move[1];
         if (newFile < 0 || newFile >= FILES || newRank < 0 || newRank >= RANKS) continue;
         else if (squares[newFile][newRank].piece.colour === piece.colour) continue;
-        else if (!pseudo && isKingInCheck(squares, file, rank, piece, newFile, newRank)) continue;
+        else if (!pseudo && isKingInCheck(boardData, file, rank, piece, newFile, newRank)) continue;
         moves.push([newFile, newRank]);
     }
 
     return moves;
 }
 
-function pawnMoves(squares: SquareData[][], file: number, rank: number, pseudo: boolean) {
+function pawnMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
+    const { squares, enPassant } = boardData;
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
@@ -264,7 +274,7 @@ function pawnMoves(squares: SquareData[][], file: number, rank: number, pseudo: 
                 break;
             // start move
             case "1":
-                if (file !== 1 && file !== 6) continue;
+                if (rank !== 1 && rank !== 6) continue;
                 // if the first move is blocked, the second move is also blocked
                 else if (moves.length === 0) continue;
                 else if (squares[newFile][newRank].piece.colour !== Colour.None) continue;
@@ -274,15 +284,18 @@ function pawnMoves(squares: SquareData[][], file: number, rank: number, pseudo: 
             case "3":
                 // eslint-disable-next-line no-case-declarations
                 const colour = squares[newFile][newRank].piece.colour;
-                if (colour === Colour.None) continue;
-                else if (colour === piece.colour) continue;
+                if (colour === piece.colour) continue;
+                if (colour === Colour.None) {
+                    if (enPassant === null) continue;
+                    else if (enPassant[0] !== newFile || enPassant[1] !== newRank) continue;
+                }
                 break;
             default:
                 break;
         }
 
         if (squares[newFile][newRank].piece.colour === piece.colour) continue;
-        else if (!pseudo && isKingInCheck(squares, file, rank, piece, newFile, newRank)) continue;
+        else if (!pseudo && isKingInCheck(boardData, file, rank, piece, newFile, newRank)) continue;
         moves.push([newFile, newRank]);
     }
 
@@ -290,10 +303,10 @@ function pawnMoves(squares: SquareData[][], file: number, rank: number, pseudo: 
 }
 
 const PAWN_DIRECTIONS: Position[] = [
-    [1, 0],
-    [2, 0],
+    [0, 1],
+    [0, 2],
     [1, 1],
-    [1, -1],
+    [-1, 1],
 ];
 
 const KNIGHT_DIRECTIONS: Position[] = [
