@@ -3,12 +3,6 @@ import "./Board.css";
 import { PieceData, Position, Type } from "./Piece";
 import Square, { SquareData } from "./Square";
 
-const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-const puzzleFen = "r3k2r/pppp1ppp/8/8/8/8/PPPP1PPP/R3K2R w KQkq - 0 1";
-
-export const RANKS = 8;
-export const FILES = 8;
-
 export enum Colour {
     None = 0,
     White = 1,
@@ -21,6 +15,8 @@ export type Castling = {
 };
 
 export type BoardData = {
+    files: number;
+    ranks: number;
     squares: SquareData[][];
     turn: Colour;
     setTurn: (value: Colour) => void;
@@ -32,14 +28,14 @@ export type BoardData = {
 
 export const BoardContext = React.createContext<BoardData>(Object.create(null));
 
-function Board() {
+function Board({ fen, files, ranks }: { fen: string; files: number; ranks: number }) {
     const [turn, setTurn] = React.useState<Colour | null>(null);
 
-    const boardData = React.useMemo(() => parseFen(puzzleFen), []);
+    const boardData = React.useMemo(() => parseFen(fen, files, ranks), []);
     boardData.turn = turn ?? boardData.turn;
     boardData.setTurn = setTurn;
 
-    console.log(boardToString(boardData));
+    // console.log(boardToString(boardData, files, ranks));
 
     return (
         <BoardContext.Provider value={boardData}>
@@ -58,9 +54,9 @@ function Board() {
                         <div className="piece promotion white bishop" />
                     </div>
                 </div> */}
-                {Array.from({ length: RANKS }, (_, rank) => (
+                {Array.from({ length: boardData.ranks }, (_, rank) => (
                     <div key={rank} className="rank">
-                        {Array.from({ length: FILES }, (_, file) => (
+                        {Array.from({ length: boardData.files }, (_, file) => (
                             <Square key={file} file={file} rank={rank} />
                         ))}
                     </div>
@@ -70,12 +66,12 @@ function Board() {
     );
 }
 
-function boardToString(boardData: BoardData) {
+function boardToString(boardData: BoardData, files: number, ranks: number) {
     const { squares } = boardData;
 
     let board = "";
-    for (let rank = 0; rank < RANKS; rank++) {
-        for (let file = 0; file < FILES; file++) {
+    for (let rank = 0; rank < ranks; rank++) {
+        for (let file = 0; file < files; file++) {
             const piece = squares[file][rank].piece;
             if (piece.type === Type.None) board += piece.type;
             else if (piece.colour === Colour.White) board += piece.type.toUpperCase();
@@ -87,31 +83,33 @@ function boardToString(boardData: BoardData) {
     return board;
 }
 
-function parseFen(fen: string): BoardData {
+function parseFen(fen: string, files: number, ranks: number): BoardData {
     const data = fen.split(" ");
     const [pieceData, turn, castling, enPassant, halfMove, fullMove] = data;
 
     return {
-        squares: parsePieceData(pieceData),
+        files,
+        ranks,
+        squares: parsePieceData(pieceData, files, ranks),
         turn: parseTurn(turn),
         setTurn: () => undefined,
         castling: parseCastling(castling),
-        enPassant: parseEnPassant(enPassant),
+        enPassant: parseEnPassant(enPassant, ranks),
         halfMove: parseHalfMove(halfMove),
         fullMove: parseFullMove(fullMove),
     };
 }
 
-function parsePieceData(pieceData: string): SquareData[][] {
-    const ranks = pieceData.split("/");
-    const rankPieces = ranks.map((rank) => rank.split(""));
+function parsePieceData(pieceData: string, files: number, ranks: number): SquareData[][] {
+    const boardPieces = pieceData.split("/");
+    const rankPieces = boardPieces.map((rank) => rank.split(""));
     const pieces = rankPieces.map((piece) => piece.flatMap(parsePiece));
 
     const squares: SquareData[][] = [];
 
-    for (let rank = 0; rank < RANKS; rank++) {
+    for (let rank = 0; rank < ranks; rank++) {
         const row: SquareData[] = [];
-        for (let file = 0; file < FILES; file++) {
+        for (let file = 0; file < files; file++) {
             row.push({
                 file,
                 rank,
@@ -214,14 +212,14 @@ function parseCastling(castling: string): Castling[] {
     return castlingArray;
 }
 
-function parseEnPassant(enPassant: string): Position | null {
+function parseEnPassant(enPassant: string, ranks: number): Position | null {
     if (enPassant === "-") return null;
     const regex = /^[a-h][1-8]$/;
     if (!regex.test(enPassant)) throw new Error("Invalid FEN");
 
     const [file, rank] = enPassant.split("");
     const fileIndex = file.charCodeAt(0) - "a".charCodeAt(0);
-    const rankIndex = RANKS - parseInt(rank);
+    const rankIndex = ranks - parseInt(rank);
 
     return [fileIndex, rankIndex];
 }

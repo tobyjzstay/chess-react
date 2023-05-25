@@ -1,5 +1,5 @@
 import React from "react";
-import { BoardContext, Colour, FILES, RANKS } from "./Board";
+import { BoardContext, Colour } from "./Board";
 import Piece, { PieceData, Type, isSquareAttacked } from "./Piece";
 import "./Square.css";
 
@@ -20,7 +20,7 @@ export const SquareContext = React.createContext<{
 
 function Square({ file, rank }: { file: number; rank: number }) {
     const boardData = React.useContext(BoardContext);
-    const { squares, turn } = boardData;
+    const { files, ranks, squares, turn } = boardData;
     const piece = squares[file][rank].piece;
 
     const [destination, setDestination] = React.useState(false);
@@ -32,8 +32,8 @@ function Square({ file, rank }: { file: number; rank: number }) {
     squares[file][rank].isSelected = selected;
     squares[file][rank].setSelected = (value: boolean) => {
         if (value)
-            for (let r = 0; r < RANKS; r++) {
-                for (let f = 0; f < FILES; f++) {
+            for (let r = 0; r < ranks; r++) {
+                for (let f = 0; f < files; f++) {
                     if (f === file && r === rank) continue;
                     squares[f][r].setSelected(false);
                     squares[f][r].setDestination(false);
@@ -60,16 +60,15 @@ function Square({ file, rank }: { file: number; rank: number }) {
         overlayClassName += " check";
 
     function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        console.log(destination);
         if (destination) {
-            const selected = getSelected(squares);
+            const selected = getSelected(files, ranks, squares);
             if (!selected) return;
             squares[file][rank].piece = selected.piece;
             selected.piece = { type: Type.None, colour: Colour.None };
             boardData.setTurn(boardData.turn === Colour.White ? Colour.Black : Colour.White);
         }
-        for (let rank = 0; rank < RANKS; rank++) {
-            for (let file = 0; file < FILES; file++) {
+        for (let rank = 0; rank < ranks; rank++) {
+            for (let file = 0; file < files; file++) {
                 squares[file][rank].setSelected(false);
                 squares[file][rank].setDestination(false);
             }
@@ -82,10 +81,10 @@ function Square({ file, rank }: { file: number; rank: number }) {
             <div className={squareClassName} onClick={handleClick}>
                 <div className={overlayClassName}>
                     {/* <p className="coord debug">{"[file:" + file + ", rank:" + rank + "]"}</p> */}
-                    {RANKS - 1 === rank && (
+                    {ranks - 1 === rank && (
                         <p className="coord file">{String.fromCharCode("a".charCodeAt(0) + file)}</p>
                     )}
-                    {FILES - 1 === file && <p className="coord rank">{RANKS - rank}</p>}
+                    {files - 1 === file && <p className="coord rank">{ranks - rank}</p>}
                     <Piece />
                 </div>
             </div>
@@ -93,9 +92,9 @@ function Square({ file, rank }: { file: number; rank: number }) {
     );
 }
 
-function getSelected(squares: SquareData[][]) {
-    for (let rank = 0; rank < RANKS; rank++) {
-        for (let file = 0; file < FILES; file++) {
+function getSelected(files: number, ranks: number, squares: SquareData[][]) {
+    for (let rank = 0; rank < ranks; rank++) {
+        for (let file = 0; file < files; file++) {
             if (squares[file][rank].isSelected) return squares[file][rank];
         }
     }
