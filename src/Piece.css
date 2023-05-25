@@ -53,3 +53,12 @@
 .piece.black.pawn {
     background-image: url("./assets/bP.svg");
 }
+
+.piece.promotion {
+    transition: all 150ms;
+    scale: 0.8;
+}
+
+.piece.promotion:hover {
+    scale: 1;
+}

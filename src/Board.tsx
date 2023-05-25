@@ -38,6 +38,20 @@ function Board() {
     return (
         <BoardContext.Provider value={boardData}>
             <div className="board">
+                {/* <div className="board promotion">
+                    <div className="square promotion">
+                        <div className="piece promotion white queen" />
+                    </div>
+                    <div className="square promotion">
+                        <div className="piece promotion white knight" />
+                    </div>
+                    <div className="square promotion">
+                        <div className="piece promotion white rook" />
+                    </div>
+                    <div className="square promotion">
+                        <div className="piece promotion white bishop" />
+                    </div>
+                </div> */}
                 {Array.from({ length: RANKS }, (_, rank) => (
                     <div key={rank} className="rank">
                         {Array.from({ length: FILES }, (_, file) => (
@@ -63,7 +77,7 @@ function boardToString(boardData: BoardData) {
         }
         board += "\n";
     }
-    
+
     return board;
 }
 

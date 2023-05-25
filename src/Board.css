@@ -2,9 +2,22 @@
     display: flex;
     flex-direction: column;
     cursor: pointer;
+    position: relative;
 }
 
 .rank {
     display: flex;
     flex-direction: row;
+}
+
+.board.promotion {
+    background-color: rgba(22, 21, 18, 0.7);
+    position: absolute;
+    cursor: default;
+    display: flex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
 }

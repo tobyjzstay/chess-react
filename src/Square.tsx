@@ -47,7 +47,7 @@ function Square({ file, rank }: { file: number; rank: number }) {
     if (rank % 2 === file % 2) squareClassName += " white";
     else squareClassName += " black";
 
-    let overlayClassName = "overlay";
+    let overlayClassName = squareClassName;
 
     if (selected) overlayClassName += " selected";
 
