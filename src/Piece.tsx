@@ -102,7 +102,7 @@ function legalMoves(boardData: BoardData, file: number, rank: number, pseudo: bo
 }
 
 function kingMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
-    const { squares } = boardData;
+    const { squares, castling } = boardData;
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
@@ -113,6 +113,35 @@ function kingMoves(boardData: BoardData, file: number, rank: number, pseudo: boo
             if (squares[newFile][newRank].piece.colour === piece.colour) continue;
             else if (!pseudo && isKingInCheck(boardData, file, rank, piece, newFile, newRank)) continue;
             moves.push([newFile, newRank]);
+        }
+    }
+
+    for (const castle of castling) {
+        if (castle.colour !== piece.colour) continue;
+
+        const rankPieces = squares.map((fileSquares) => fileSquares[rank].piece);
+
+        switch (castle.type) {
+            case Type.Queen:
+                if (rankPieces[0].type !== Type.Rook) continue;
+                for (let f = 1; f <= file; f++) {
+                    if (rankPieces[f].type === Type.King) {
+                        if (f < 2) continue;
+                        moves.push([f - 2, rank], [0, rank]);
+                    } else if (rankPieces[f].type !== Type.None) continue;
+                }
+                break;
+            case Type.King:
+                if (rankPieces[FILES - 1].type !== Type.Rook) break;
+                for (let f = FILES - 2; f >= file; f--) {
+                    if (rankPieces[f].type === Type.King) {
+                        if (FILES - 1 - f < 2) break;
+                        moves.push([f + 2, rank], [FILES - 1, rank]);
+                    } else if (rankPieces[f].type !== Type.None) break;
+                }
+                break;
+            default:
+                break;
         }
     }
 
