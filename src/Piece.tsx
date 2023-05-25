@@ -9,13 +9,13 @@ export type PieceData = {
 };
 
 export enum Type {
-    None = 0,
-    King = 1,
-    Queen = 2,
-    Rook = 3,
-    Bishop = 4,
-    Knight = 5,
-    Pawn = 6,
+    None = ".",
+    King = "k",
+    Queen = "q",
+    Rook = "r",
+    Bishop = "b",
+    Knight = "n",
+    Pawn = "p",
 }
 
 export type Position = [number, number]; // [file, rank]

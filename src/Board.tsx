@@ -4,7 +4,7 @@ import { PieceData, Position, Type } from "./Piece";
 import Square, { SquareData } from "./Square";
 
 const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-const puzzleFen = "r1b2r1k/4qp1p/p1Nppb1Q/4nP2/1p2P3/2N5/PPP4P/2KR1BR1 b - - 5 18";
+const puzzleFen = "r3k2r/pppp1ppp/8/8/8/8/PPPP1PPP/R3K2R w KQkq - 0 1";
 
 export const RANKS = 8;
 export const FILES = 8;
@@ -15,10 +15,15 @@ export enum Colour {
     Black = 2,
 }
 
+export type Castling = {
+    colour: Colour;
+    type: Type;
+};
+
 export type BoardData = {
     squares: SquareData[][];
     turn: Colour;
-    castling: string;
+    castling: Castling[];
     enPassant: Position | null;
     halfMove: number;
     fullMove: number;
@@ -28,6 +33,7 @@ export const BoardContext = React.createContext<BoardData>(Object.create(null));
 
 function Board() {
     const boardData = parseFen(puzzleFen);
+    console.log(boardToString(boardData));
 
     return (
         <BoardContext.Provider value={boardData}>
@@ -42,6 +48,23 @@ function Board() {
             </div>
         </BoardContext.Provider>
     );
+}
+
+function boardToString(boardData: BoardData) {
+    const { squares } = boardData;
+
+    let board = "";
+    for (let rank = 0; rank < RANKS; rank++) {
+        for (let file = 0; file < FILES; file++) {
+            const piece = squares[file][rank].piece;
+            if (piece.type === Type.None) board += piece.type;
+            else if (piece.colour === Colour.White) board += piece.type.toUpperCase();
+            else board += piece.type;
+        }
+        board += "\n";
+    }
+    
+    return board;
 }
 
 function parseFen(fen: string): BoardData {
@@ -71,7 +94,7 @@ function parsePieceData(pieceData: string): SquareData[][] {
             row.push({
                 file,
                 rank,
-                piece: pieces[file][rank] || { type: Type.None, colour: Colour.None },
+                piece: pieces[file][rank],
             } as SquareData);
         }
         squares.push(row);
@@ -128,8 +151,46 @@ function parseTurn(turn: string): Colour {
     }
 }
 
-function parseCastling(castling: string): string {
-    return castling;
+function parseCastling(castling: string): Castling[] {
+    const castlingRegex = /^[KQkq-]{1,4}$/;
+    if (!castlingRegex.test(castling)) throw new Error("Invalid FEN");
+
+    const castlingArray: Castling[] = [];
+    if (castling === "-") return castlingArray;
+
+    const castlingSides = castling.split("");
+    for (const castlingSide of castlingSides) {
+        switch (castlingSide) {
+            case "K":
+                castlingArray.push({
+                    colour: Colour.White,
+                    type: Type.King,
+                });
+                break;
+            case "Q":
+                castlingArray.push({
+                    colour: Colour.White,
+                    type: Type.Queen,
+                });
+                break;
+            case "k":
+                castlingArray.push({
+                    colour: Colour.Black,
+                    type: Type.King,
+                });
+                break;
+            case "q":
+                castlingArray.push({
+                    colour: Colour.Black,
+                    type: Type.Queen,
+                });
+                break;
+            default:
+                break;
+        }
+    }
+
+    return castlingArray;
 }
 
 function parseEnPassant(enPassant: string): Position | null {

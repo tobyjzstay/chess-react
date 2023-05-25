@@ -74,7 +74,7 @@ function Square({ file, rank }: { file: number; rank: number }) {
         <SquareContext.Provider value={{ file, rank }}>
             <div className={squareClassName} onClick={handleClick}>
                 <div className={overlayClassName}>
-                    <p className="coord debug">{"[file:" + file + ", rank:" + rank + "]"}</p>
+                    {/* <p className="coord debug">{"[file:" + file + ", rank:" + rank + "]"}</p> */}
                     {RANKS - 1 === rank && (
                         <p className="coord file">{String.fromCharCode("a".charCodeAt(0) + file)}</p>
                     )}
