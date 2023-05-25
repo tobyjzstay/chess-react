@@ -1,5 +1,5 @@
 import React from "react";
-import { BoardContext, FILES, RANKS } from "./Board";
+import { BoardContext, Colour, FILES, RANKS } from "./Board";
 import Piece, { PieceData, Type, isSquareAttacked } from "./Piece";
 import "./Square.css";
 
@@ -60,7 +60,14 @@ function Square({ file, rank }: { file: number; rank: number }) {
         overlayClassName += " check";
 
     function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        if (destination) return;
+        console.log(destination);
+        if (destination) {
+            const selected = getSelected(squares);
+            if (!selected) return;
+            squares[file][rank].piece = selected.piece;
+            selected.piece = { type: Type.None, colour: Colour.None };
+            boardData.setTurn(boardData.turn === Colour.White ? Colour.Black : Colour.White);
+        }
         for (let rank = 0; rank < RANKS; rank++) {
             for (let file = 0; file < FILES; file++) {
                 squares[file][rank].setSelected(false);
@@ -84,6 +91,15 @@ function Square({ file, rank }: { file: number; rank: number }) {
             </div>
         </SquareContext.Provider>
     );
+}
+
+function getSelected(squares: SquareData[][]) {
+    for (let rank = 0; rank < RANKS; rank++) {
+        for (let file = 0; file < FILES; file++) {
+            if (squares[file][rank].isSelected) return squares[file][rank];
+        }
+    }
+    return null;
 }
 
 export default Square;

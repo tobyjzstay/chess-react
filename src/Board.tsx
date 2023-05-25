@@ -23,6 +23,7 @@ export type Castling = {
 export type BoardData = {
     squares: SquareData[][];
     turn: Colour;
+    setTurn: (value: Colour) => void;
     castling: Castling[];
     enPassant: Position | null;
     halfMove: number;
@@ -32,7 +33,12 @@ export type BoardData = {
 export const BoardContext = React.createContext<BoardData>(Object.create(null));
 
 function Board() {
-    const boardData = parseFen(puzzleFen);
+    const [turn, setTurn] = React.useState<Colour | null>(null);
+
+    const boardData = React.useMemo(() => parseFen(puzzleFen), []);
+    boardData.turn = turn ?? boardData.turn;
+    boardData.setTurn = setTurn;
+
     console.log(boardToString(boardData));
 
     return (
@@ -88,6 +94,7 @@ function parseFen(fen: string): BoardData {
     return {
         squares: parsePieceData(pieceData),
         turn: parseTurn(turn),
+        setTurn: () => undefined,
         castling: parseCastling(castling),
         enPassant: parseEnPassant(enPassant),
         halfMove: parseHalfMove(halfMove),
