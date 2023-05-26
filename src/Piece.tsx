@@ -276,6 +276,7 @@ function knightMoves(boardData: BoardData, file: number, rank: number, pseudo: b
 
 function pawnMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
     const { files, ranks, squares, enPassant } = boardData;
+    console.log(enPassant);
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 

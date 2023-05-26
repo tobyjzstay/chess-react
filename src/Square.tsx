@@ -66,6 +66,9 @@ function Square({ file, rank }: { file: number; rank: number }) {
             squares[file][rank].piece = selected.piece;
             selected.piece = { type: Type.None, colour: Colour.None };
             boardData.setTurn(boardData.turn === Colour.White ? Colour.Black : Colour.White);
+            boardData.setEnPassant(null);
+            if (squares[file][rank].piece.type === Type.Pawn && Math.abs(selected.file - rank) === 2)
+                boardData.setEnPassant([file, rank + (selected.file - rank) / 2]);
         }
         for (let rank = 0; rank < ranks; rank++) {
             for (let file = 0; file < files; file++) {
