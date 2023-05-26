@@ -53,20 +53,12 @@
     padding-right: 4px;
 }
 
-.square.previous {
-    background-color: rgba(155, 199, 0, 0.41);
-}
-
 .square.destination {
     background: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
 }
 
 .square.destination:hover {
     background: rgba(20, 85, 30, 0.3);
-}
-
-.square.selected {
-    background-color: rgba(20, 85, 30, 0.5);
 }
 
 .square.capture {
@@ -81,6 +73,14 @@
         rgba(169, 0, 0, 0) 89%,
         rgba(158, 0, 0, 0) 100%
     );
+}
+
+.square.previous {
+    background-color: rgba(155, 199, 0, 0.41);
+}
+
+.square.selected {
+    background-color: rgba(20, 85, 30, 0.5);
 }
 
 .square.promotion {

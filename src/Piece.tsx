@@ -159,17 +159,17 @@ function isIllegalMove(
     newFile: number,
     newRank: number
 ) {
-    const { files, ranks, squares } = boardData;
-    const newSquares = squares.map((row) => row.map((square) => ({ ...square })));
+    const _boardData = JSON.parse(JSON.stringify(boardData)) as BoardData;
+    const { files, ranks, squares } = _boardData;
 
-    newSquares[file][rank].piece = { type: Type.None, colour: Colour.None };
-    newSquares[newFile][newRank].piece = piece;
+    squares[file][rank].piece = { type: Type.None, colour: Colour.None };
+    squares[newFile][newRank].piece = piece;
 
     for (let r = 0; r < ranks; r++) {
         for (let f = 0; f < files; f++) {
-            const p = newSquares[f][r].piece;
+            const p = squares[f][r].piece;
             if (p.colour === piece.colour && p.type === Type.King) {
-                if (isSquareAttacked(boardData, f, r, p.colour)) return true;
+                if (isSquareAttacked(_boardData, f, r, p.colour)) return true;
             }
         }
     }
@@ -276,7 +276,6 @@ function knightMoves(boardData: BoardData, file: number, rank: number, pseudo: b
 
 function pawnMoves(boardData: BoardData, file: number, rank: number, pseudo: boolean) {
     const { files, ranks, squares, enPassant } = boardData;
-    console.log(enPassant);
     const piece = squares[file][rank].piece;
     const moves: Position[] = [];
 
