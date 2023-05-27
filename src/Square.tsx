@@ -1,5 +1,5 @@
 import React from "react";
-import { BoardContext, Colour } from "./Board";
+import { BoardContext, BoardData, Colour } from "./Board";
 import Piece, { PieceData, Type, isSquareAttacked } from "./Piece";
 import "./Square.css";
 
@@ -60,16 +60,7 @@ function Square({ file, rank }: { file: number; rank: number }) {
         overlayClassName += " check";
 
     function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        if (destination) {
-            const selected = getSelected(files, ranks, squares);
-            if (!selected) return;
-            squares[file][rank].piece = selected.piece;
-            selected.piece = { type: Type.None, colour: Colour.None };
-            boardData.setTurn(boardData.turn === Colour.White ? Colour.Black : Colour.White);
-            boardData.setEnPassant(null);
-            if (squares[file][rank].piece.type === Type.Pawn && Math.abs(selected.file - rank) === 2)
-                boardData.setEnPassant([file, rank + (selected.file - rank) / 2]);
-        }
+        if (destination) movePiece(boardData, file, rank);
         for (let rank = 0; rank < ranks; rank++) {
             for (let file = 0; file < files; file++) {
                 squares[file][rank].setSelected(false);
@@ -93,6 +84,18 @@ function Square({ file, rank }: { file: number; rank: number }) {
             </div>
         </SquareContext.Provider>
     );
+}
+
+function movePiece(boardData: BoardData, file: number, rank: number) {
+    const { files, ranks, squares } = boardData;
+    const selected = getSelected(files, ranks, squares);
+    if (!selected) return;
+    squares[file][rank].piece = selected.piece;
+    selected.piece = { type: Type.None, colour: Colour.None };
+    boardData.setTurn(boardData.turn === Colour.White ? Colour.Black : Colour.White);
+    boardData.setEnPassant(null);
+    if (squares[file][rank].piece.type === Type.Pawn && Math.abs(selected.file - rank) === 2)
+        boardData.setEnPassant([file, rank + (selected.file - rank) / 2]);
 }
 
 function getSelected(files: number, ranks: number, squares: SquareData[][]) {
