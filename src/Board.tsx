@@ -32,7 +32,7 @@ export const BoardContext = React.createContext<BoardData>(Object.create(null));
 /**
  * Board component
  * @param {{string, number, number}} props fen, files, ranks
- * @return {JSX.Element}
+ * @return {JSX.Element} Board
  */
 function Board({
   fen,
@@ -89,10 +89,10 @@ function Board({
 
 /**
  * Get the board as a string
- * @param {BoardData} boardData
- * @param {number} files
- * @param {number} ranks
- * @return {string}
+ * @param {BoardData} boardData The board data
+ * @param {number} files The number of files
+ * @param {number} ranks The number of ranks
+ * @return {string} The board as a string
  */
 function boardToString(
   boardData: BoardData,
@@ -118,10 +118,10 @@ function boardToString(
 
 /**
  * Parse the FEN string
- * @param {string} fen
- * @param {number} files
- * @param {number} ranks
- * @return {BoardData}
+ * @param {string} fen FEN string
+ * @param {number} files The number of files
+ * @param {number} ranks The number of ranks
+ * @return {BoardData} The board data
  */
 function parseFen(fen: string, files: number, ranks: number): BoardData {
   const data = fen.split(' ');
@@ -144,8 +144,8 @@ function parseFen(fen: string, files: number, ranks: number): BoardData {
 /**
  * Parse the FEN piece data
  * @param {string} pieceData FEN piece data string
- * @param {number} files number of files
- * @param {number} ranks number of ranks
+ * @param {number} files The number of files
+ * @param {number} ranks The number of ranks
  * @return {(SquareData[])[]} 2D array of SquareData
  */
 function parsePieceData(
@@ -177,7 +177,7 @@ function parsePieceData(
 /**
  * Parse the FEN piece
  * @param {string} piece FEN piece string
- * @return {PieceData[]} array of PieceData
+ * @return {PieceData[]} Array of PieceData
  */
 function parsePiece(piece: string): PieceData[] {
   switch (piece) {
@@ -235,7 +235,7 @@ function parseTurn(turn: string): Colour {
 /**
  * Parse the FEN castling
  * @param {string} castling FEN castling string
- * @return {Castling[]} array of Castling
+ * @return {Castling[]} Array of Castling
  */
 function parseCastling(castling: string): Castling[] {
   const castlingRegex = /^[KQkq-]{1,4}$/;
@@ -282,7 +282,7 @@ function parseCastling(castling: string): Castling[] {
 /**
  * Parse the FEN en passant
  * @param {string} enPassant FEN en passant string
- * @param {number} ranks number of ranks
+ * @param {number} ranks The number of ranks
  * @return {Position | null} Position of the en passant square
  */
 function parseEnPassant(enPassant: string, ranks: number): Position | null {
@@ -300,7 +300,7 @@ function parseEnPassant(enPassant: string, ranks: number): Position | null {
 /**
  * Parse the FEN half move
  * @param {string} halfMove FEN half move string
- * @return {number} number of half moves
+ * @return {number} The number of half moves
  */
 function parseHalfMove(halfMove: string): number {
   const hm = parseInt(halfMove);
@@ -311,7 +311,7 @@ function parseHalfMove(halfMove: string): number {
 /**
  * Parse the FEN full move
  * @param {string} fullMove FEN full move string
- * @return {number} number of full moves
+ * @return {number} The number of full moves
  */
 function parseFullMove(fullMove: string): number {
   const fm = parseInt(fullMove);

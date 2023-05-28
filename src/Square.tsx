@@ -21,7 +21,7 @@ export const SquareContext = React.createContext<{
 /**
  * Square component
  * @param {{number, number}} props file, rank
- * @return {JSX.Element}
+ * @return {JSX.Element} Square
  */
 function Square({file, rank}: {file: number; rank: number}): JSX.Element {
   const boardData = React.useContext(BoardContext);
@@ -36,7 +36,8 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
 
   squares[file][rank].isSelected = selected;
   squares[file][rank].setSelected = (value: boolean) => {
-    if (value) {
+    if (value)
+      // clear all other selected squares
       for (let r = 0; r < ranks; r++) {
         for (let f = 0; f < files; f++) {
           if (f === file && r === rank) continue;
@@ -44,7 +45,6 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
           squares[f][r].setDestination(false);
         }
       }
-    }
     setSelected(value);
   };
 
@@ -72,7 +72,7 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
 
   /**
    * Handle click event
-   * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
+   * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event The mouse event
    */
   function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (destination) movePiece(boardData, file, rank);
@@ -107,9 +107,9 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
 
 /**
  * Move piece to destination
- * @param {BoardData} boardData
- * @param {number} file
- * @param {number} rank
+ * @param {BoardData} boardData The board data
+ * @param {number} file The file of the piece
+ * @param {number} rank The rank of the piece
  * @return {void}
  */
 function movePiece(boardData: BoardData, file: number, rank: number): void {
@@ -132,10 +132,10 @@ function movePiece(boardData: BoardData, file: number, rank: number): void {
 
 /**
  * Get selected square
- * @param {number} files
- * @param {number} ranks
- * @param {(SquareData[])[]} squares
- * @return {SquareData | null}
+ * @param {number} files The number of files
+ * @param {number} ranks The number of ranks
+ * @param {(SquareData[])[]} squares The board squares
+ * @return {SquareData | null} The selected square
  */
 function getSelected(
   files: number,
