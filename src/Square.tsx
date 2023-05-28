@@ -116,18 +116,68 @@ function movePiece(boardData: BoardData, file: number, rank: number): void {
   const {files, ranks, squares} = boardData;
   const selected = getSelected(files, ranks, squares);
   if (!selected) return;
+
+  // move piece
   squares[file][rank].piece = selected.piece;
   selected.piece = {type: Type.None, colour: Colour.None};
+
+  boardData.setEnPassant(null);
+
+  // handle special moves
+  switch (squares[file][rank].piece.type) {
+    case Type.Pawn:
+      if (Math.abs(selected.file - rank) === 2)
+        // TODO: en passant
+        boardData.setEnPassant([file, rank + (selected.file - rank) / 2]);
+      // TODO: promotion
+      break;
+    case Type.King:
+      // remove castling rights
+      boardData.setCastling(
+        boardData.castling.filter(
+          castling => castling.colour !== squares[file][rank].piece.colour
+        )
+      );
+      // castling
+      // eslint-disable-next-line no-case-declarations
+      const dx = file - selected.rank;
+      if (Math.abs(dx) === 2) {
+        if (dx > 0) {
+          // kingside
+          squares[file - 1][rank].piece = squares[files - 1][rank].piece;
+          squares[files - 1][rank].piece = {
+            type: Type.None,
+            colour: Colour.None,
+          };
+        } else {
+          // queenside
+          squares[file + 1][rank].piece = squares[0][rank].piece;
+          squares[0][rank].piece = {
+            type: Type.None,
+            colour: Colour.None,
+          };
+        }
+      }
+      break;
+    case Type.Rook:
+      // remove castling rights
+      boardData.setCastling(
+        boardData.castling.filter(
+          castling =>
+            castling.colour !== squares[file][rank].piece.colour ||
+            (file !== 0 && castling.type === Type.Queen) ||
+            (file !== files - 1 && castling.type === Type.King)
+        )
+      );
+      break;
+    default:
+      break;
+  }
+
+  // change turn
   boardData.setTurn(
     boardData.turn === Colour.White ? Colour.Black : Colour.White
   );
-  boardData.setEnPassant(null);
-  if (
-    squares[file][rank].piece.type === Type.Pawn &&
-    Math.abs(selected.file - rank) === 2
-  ) {
-    boardData.setEnPassant([file, rank + (selected.file - rank) / 2]);
-  }
 }
 
 /**

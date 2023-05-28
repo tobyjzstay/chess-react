@@ -21,6 +21,7 @@ export type BoardData = {
   turn: Colour;
   setTurn: (value: Colour) => void;
   castling: Castling[];
+  setCastling: (value: Castling[]) => void;
   enPassant: Position | null;
   setEnPassant: (value: Position | null) => void;
   halfMove: number;
@@ -46,12 +47,18 @@ function Board({
   const boardData = React.useMemo(() => parseFen(fen, files, ranks), []);
 
   const [turn, setTurn] = React.useState<Colour>(boardData.turn);
+  const [castling, setCastling] = React.useState<Castling[]>(
+    boardData.castling
+  );
   const [enPassant, setEnPassant] = React.useState<Position | null>(
     boardData.enPassant
   );
 
   boardData.turn = turn;
   boardData.setTurn = setTurn;
+
+  boardData.castling = castling;
+  boardData.setCastling = setCastling;
 
   boardData.enPassant = enPassant;
   boardData.setEnPassant = setEnPassant;
@@ -134,6 +141,7 @@ function parseFen(fen: string, files: number, ranks: number): BoardData {
     turn: parseTurn(turn),
     setTurn: () => undefined,
     castling: parseCastling(castling),
+    setCastling: () => undefined,
     enPassant: parseEnPassant(enPassant, ranks),
     setEnPassant: () => undefined,
     halfMove: parseHalfMove(halfMove),
