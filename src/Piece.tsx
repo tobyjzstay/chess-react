@@ -169,23 +169,23 @@ function kingMoves(
         case Type.Queen:
           if (rankPieces[0].type !== Type.Rook) continue;
           for (let f = 1; f <= file; f++) {
-            if (!pseudo && isSquareAttacked(boardData, f, rank, piece.colour)) {
+            if (!pseudo && isSquareAttacked(boardData, f, rank, piece.colour))
               break;
-            } else if (rankPieces[f].type === Type.King) {
+            else if (rankPieces[f].type === Type.King) {
               if (f < 2) continue;
               moves.push([f - 2, rank], [0, rank]);
-            } else if (rankPieces[f].type !== Type.None) continue;
+            } else if (rankPieces[f].type !== Type.None) break;
           }
           break;
         case Type.King:
           if (rankPieces[files - 1].type !== Type.Rook) continue;
           for (let f = files - 2; f >= file; f--) {
-            if (!pseudo && isSquareAttacked(boardData, f, rank, piece.colour)) {
+            if (!pseudo && isSquareAttacked(boardData, f, rank, piece.colour))
               break;
-            } else if (rankPieces[f].type === Type.King) {
-              if (files - 1 - f < 2) continue;
+            else if (rankPieces[f].type === Type.King) {
+              if (files - 1 - f < 2) break;
               moves.push([f + 2, rank], [files - 1, rank]);
-            } else if (rankPieces[f].type !== Type.None) continue;
+            } else if (rankPieces[f].type !== Type.None) break;
           }
           break;
         default:
