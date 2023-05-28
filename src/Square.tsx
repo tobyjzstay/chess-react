@@ -127,8 +127,18 @@ function movePiece(boardData: BoardData, file: number, rank: number): void {
   switch (squares[file][rank].piece.type) {
     case Type.Pawn:
       if (Math.abs(selected.file - rank) === 2)
-        // TODO: en passant
+        // add en passant
         boardData.setEnPassant([file, rank + (selected.file - rank) / 2]);
+      else if (
+        boardData.enPassant !== null &&
+        file === boardData.enPassant[0] &&
+        rank === boardData.enPassant[1]
+      ) {
+        // en passant
+        squares[file][
+          rank + (squares[file][rank].piece.colour === Colour.White ? 1 : -1)
+        ].piece = {type: Type.None, colour: Colour.None};
+      }
       // TODO: promotion
       break;
     case Type.King:
