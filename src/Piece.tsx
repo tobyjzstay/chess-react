@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React from 'react';
 import {BoardContext, BoardData, Colour} from './Board';
 import './Piece.css';
@@ -75,7 +74,7 @@ function Piece(): JSX.Element | null {
    * @return {void}
    */
   function handleClick(
-      event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ): void {
     if (piece.colour !== turn) return;
     const isSelected = square.isSelected;
@@ -99,10 +98,10 @@ function Piece(): JSX.Element | null {
  * @return {Position[]} The legal moves
  */
 function legalMoves(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    pseudo: boolean,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  pseudo: boolean
 ): Position[] {
   const {squares} = boardData;
   const piece = squares[file][rank].piece;
@@ -135,10 +134,10 @@ function legalMoves(
  * @return {Position[]} The legal moves
  */
 function kingMoves(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    pseudo: boolean,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  pseudo: boolean
 ): Position[] {
   const {files, ranks, squares, castling} = boardData;
   const piece = squares[file][rank].piece;
@@ -164,7 +163,7 @@ function kingMoves(
     for (const castle of castling) {
       if (castle.colour !== piece.colour) continue;
 
-      const rankPieces = squares.map((fileSquares) => fileSquares[rank].piece);
+      const rankPieces = squares.map(fileSquares => fileSquares[rank].piece);
 
       switch (castle.type) {
         case Type.Queen:
@@ -209,12 +208,12 @@ function kingMoves(
  * @return {boolean} Whether the move is illegal
  */
 function isIllegalMove(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    piece: PieceData,
-    newFile: number,
-    newRank: number,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  piece: PieceData,
+  newFile: number,
+  newRank: number
 ): boolean {
   const _boardData = JSON.parse(JSON.stringify(boardData)) as BoardData;
   const {files, ranks, squares} = _boardData;
@@ -243,10 +242,10 @@ function isIllegalMove(
  * @return {boolean} Whether the square is attacked
  */
 export function isSquareAttacked(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    colour: Colour,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  colour: Colour
 ): boolean {
   const {files, ranks, squares} = boardData;
   for (let r = 0; r < ranks; r++) {
@@ -273,10 +272,10 @@ export function isSquareAttacked(
  * @return {Position[]} The legal moves
  */
 function queenMoves(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    pseudo: boolean,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  pseudo: boolean
 ): Position[] {
   const {squares, files, ranks} = boardData;
   const piece = squares[file][rank].piece;
@@ -314,10 +313,10 @@ function queenMoves(
  * @return {Position[]} The legal moves
  */
 function rookMoves(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    pseudo: boolean,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  pseudo: boolean
 ): Position[] {
   const {files, ranks, squares} = boardData;
   const piece = squares[file][rank].piece;
@@ -355,10 +354,10 @@ function rookMoves(
  * @return {Position[]} The legal moves
  */
 function bishopMoves(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    pseudo: boolean,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  pseudo: boolean
 ): Position[] {
   const {files, ranks, squares} = boardData;
   const piece = squares[file][rank].piece;
@@ -396,10 +395,10 @@ function bishopMoves(
  * @return {Position[]} The legal moves
  */
 function knightMoves(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    pseudo: boolean,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  pseudo: boolean
 ): Position[] {
   const {files, ranks, squares} = boardData;
   const piece = squares[file][rank].piece;
@@ -433,10 +432,10 @@ function knightMoves(
  * @return {Position[]} The legal moves
  */
 function pawnMoves(
-    boardData: BoardData,
-    file: number,
-    rank: number,
-    pseudo: boolean,
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  pseudo: boolean
 ) {
   const {files, ranks, squares, enPassant} = boardData;
   const piece = squares[file][rank].piece;

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React from 'react';
 import './Board.css';
 import {PieceData, Position, Type} from './Piece';
@@ -48,7 +47,7 @@ function Board({
 
   const [turn, setTurn] = React.useState<Colour>(boardData.turn);
   const [enPassant, setEnPassant] = React.useState<Position | null>(
-      boardData.enPassant,
+    boardData.enPassant
   );
 
   boardData.turn = turn;
@@ -96,9 +95,9 @@ function Board({
  * @return {string}
  */
 function boardToString(
-    boardData: BoardData,
-    files: number,
-    ranks: number,
+  boardData: BoardData,
+  files: number,
+  ranks: number
 ): string {
   const {squares} = boardData;
 
@@ -150,13 +149,13 @@ function parseFen(fen: string, files: number, ranks: number): BoardData {
  * @return {(SquareData[])[]} 2D array of SquareData
  */
 function parsePieceData(
-    pieceData: string,
-    files: number,
-    ranks: number,
+  pieceData: string,
+  files: number,
+  ranks: number
 ): SquareData[][] {
   const boardPieces = pieceData.split('/');
-  const rankPieces = boardPieces.map((rank) => rank.split(''));
-  const pieces = rankPieces.map((piece) => piece.flatMap(parsePiece));
+  const rankPieces = boardPieces.map(rank => rank.split(''));
+  const pieces = rankPieces.map(piece => piece.flatMap(parsePiece));
 
   const squares: SquareData[][] = [];
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import './App.css';
 import Board from './Board';
 
@@ -12,7 +13,6 @@ export const FILES = 8;
  * @return {JSX.Element} App
  */
 function App(): JSX.Element {
-  // eslint-disable-next-line react/react-in-jsx-scope
   return <Board files={FILES} ranks={RANKS} fen={STARTING_POSITION} />;
 }
 

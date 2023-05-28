@@ -23,7 +23,7 @@ export const SquareContext = React.createContext<{
  * @param {{number, number}} props file, rank
  * @return {JSX.Element}
  */
-function Square({file, rank}: { file: number; rank: number }): JSX.Element {
+function Square({file, rank}: {file: number; rank: number}): JSX.Element {
   const boardData = React.useContext(BoardContext);
   const {files, ranks, squares, turn} = boardData;
   const piece = squares[file][rank].piece;
@@ -119,7 +119,7 @@ function movePiece(boardData: BoardData, file: number, rank: number): void {
   squares[file][rank].piece = selected.piece;
   selected.piece = {type: Type.None, colour: Colour.None};
   boardData.setTurn(
-    boardData.turn === Colour.White ? Colour.Black : Colour.White,
+    boardData.turn === Colour.White ? Colour.Black : Colour.White
   );
   boardData.setEnPassant(null);
   if (
@@ -138,9 +138,9 @@ function movePiece(boardData: BoardData, file: number, rank: number): void {
  * @return {SquareData | null}
  */
 function getSelected(
-    files: number,
-    ranks: number,
-    squares: SquareData[][],
+  files: number,
+  ranks: number,
+  squares: SquareData[][]
 ): SquareData | null {
   for (let rank = 0; rank < ranks; rank++) {
     for (let file = 0; file < files; file++) {
