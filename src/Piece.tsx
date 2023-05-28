@@ -292,7 +292,9 @@ function queenMoves(
         !pseudo &&
         isIllegalMove(boardData, file, rank, piece, newFile, newRank)
       ) {
-        break;
+        newFile += move[0];
+        newRank += move[1];
+        continue;
       }
       moves.push([newFile, newRank]);
       if (squares[newFile][newRank].piece.colour !== Colour.None) break;
@@ -333,7 +335,9 @@ function rookMoves(
         !pseudo &&
         isIllegalMove(boardData, file, rank, piece, newFile, newRank)
       ) {
-        break;
+        newFile += move[0];
+        newRank += move[1];
+        continue;
       }
       moves.push([newFile, newRank]);
       if (squares[newFile][newRank].piece.colour !== Colour.None) break;
@@ -374,7 +378,9 @@ function bishopMoves(
         !pseudo &&
         isIllegalMove(boardData, file, rank, piece, newFile, newRank)
       ) {
-        break;
+        newFile += move[0];
+        newRank += move[1];
+        continue;
       }
       moves.push([newFile, newRank]);
       if (squares[newFile][newRank].piece.colour !== Colour.None) break;
@@ -414,9 +420,8 @@ function knightMoves(
     } else if (
       !pseudo &&
       isIllegalMove(boardData, file, rank, piece, newFile, newRank)
-    ) {
+    )
       continue;
-    }
     moves.push([newFile, newRank]);
   }
 
