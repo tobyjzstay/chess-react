@@ -1,6 +1,11 @@
 import React from 'react';
-import {BoardContext, BoardData, Colour} from './Board';
-import Piece, {PieceData, Type, isSquareAttacked} from './Piece';
+import {BoardContext, BoardData, Colour, PromotionContext} from './Board';
+import Piece, {
+  PieceData,
+  PiecePromotion,
+  Type,
+  isSquareAttacked,
+} from './Piece';
 import './Square.css';
 
 export type SquareData = {
@@ -25,6 +30,7 @@ export const SquareContext = React.createContext<{
  */
 function Square({file, rank}: {file: number; rank: number}): JSX.Element {
   const boardData = React.useContext(BoardContext);
+  const [, setPromotion] = React.useContext(PromotionContext);
   const {files, ranks, squares, turn} = boardData;
   const piece = squares[file][rank].piece;
 
@@ -73,9 +79,12 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
   /**
    * Handle click event
    * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event The mouse event
+   * @return {void}
    */
-  function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if (destination) movePiece(boardData, file, rank);
+  function handleClick(
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ): void {
+    if (destination) movePiece(boardData, file, rank, setPromotion);
     for (let rank = 0; rank < ranks; rank++) {
       for (let file = 0; file < files; file++) {
         squares[file][rank].setSelected(false);
@@ -106,13 +115,35 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
 }
 
 /**
+ * Square promotion option
+ * @param {{PieceData}} props The piece to promote to
+ * @return {JSX.Element} The promotion square option
+ */
+export function SquarePromotion({
+  promotionPiece,
+}: {
+  promotionPiece: PieceData;
+}): JSX.Element {
+  return (
+    <div className="square promotion">
+      <PiecePromotion promotionPiece={promotionPiece} />
+    </div>
+  );
+}
+
+/**
  * Move piece to destination
  * @param {BoardData} boardData The board data
  * @param {number} file The file of the piece
  * @param {number} rank The rank of the piece
  * @return {void}
  */
-function movePiece(boardData: BoardData, file: number, rank: number): void {
+function movePiece(
+  boardData: BoardData,
+  file: number,
+  rank: number,
+  setPromotion: React.Dispatch<React.SetStateAction<SquareData | null>>
+): void {
   const {files, ranks, squares} = boardData;
   const selected = getSelected(files, ranks, squares);
   if (!selected) return;
@@ -138,8 +169,9 @@ function movePiece(boardData: BoardData, file: number, rank: number): void {
         squares[file][
           rank + (squares[file][rank].piece.colour === Colour.White ? 1 : -1)
         ].piece = {type: Type.None, colour: Colour.None};
-      }
-      // TODO: promotion
+      } else if (rank === 0 || rank === ranks - 1)
+        // promotion
+        setPromotion(squares[file][rank]);
       break;
     case Type.King:
       // remove castling rights

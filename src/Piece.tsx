@@ -1,7 +1,7 @@
 import React from 'react';
-import { BoardContext, BoardData, Colour } from './Board';
+import {BoardContext, BoardData, Colour, PromotionContext} from './Board';
 import './Piece.css';
-import { SquareContext } from './Square';
+import {SquareContext} from './Square';
 
 export type PieceData = {
   colour: Colour;
@@ -32,8 +32,59 @@ function Piece(): JSX.Element | null {
   const square = squares[file][rank];
   const piece = square.piece;
 
-  let className = 'piece';
+  const className = getPieceClassName(piece, 'piece');
+  if (className === null) return null;
 
+  /**
+   * Handle click event
+   * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event The mouse event
+   * @return {void}
+   */
+  function handleClick(
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ): void {
+    if (piece.colour !== turn) return;
+    const isSelected = square.isSelected;
+    square.setSelected(!isSelected);
+    const moves = legalMoves(boardData, file, rank, false);
+    moves.forEach(([file, rank]) => {
+      squares[file][rank].setDestination(!isSelected);
+    });
+    event.stopPropagation();
+  }
+
+  return <div className={className} onClick={handleClick}></div>;
+}
+
+/**
+ * Piece promotion component
+ * @param {{PieceData}} props The piece to promote to
+ * @return {JSX.Element} The promotion piece option
+ */
+export function PiecePromotion({
+  promotionPiece,
+}: {
+  promotionPiece: PieceData;
+}): JSX.Element {
+  const {promote} = React.useContext(BoardContext);
+  const [promotion] = React.useContext(PromotionContext);
+  const className = getPieceClassName(promotionPiece, 'piece promotion')!;
+  return (
+    <div
+      className={className}
+      onClick={() => promote(promotion!, promotionPiece)}
+    />
+  );
+}
+
+/**
+ * Get the class name for a piece
+ * @param {PieceData} piece The piece
+ * @param {prefix} prefix The class name prefix
+ * @return {string | null} The class name
+ */
+function getPieceClassName(piece: PieceData, prefix: string): string | null {
+  let className = prefix;
   switch (piece.colour) {
     case Colour.White:
       className += ' white';
@@ -68,25 +119,7 @@ function Piece(): JSX.Element | null {
       return null;
   }
 
-  /**
-   * Handle click event
-   * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event The mouse event
-   * @return {void}
-   */
-  function handleClick(
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ): void {
-    if (piece.colour !== turn) return;
-    const isSelected = square.isSelected;
-    square.setSelected(!isSelected);
-    const moves = legalMoves(boardData, file, rank, false);
-    moves.forEach(([file, rank]) => {
-      squares[file][rank].setDestination(!isSelected);
-    });
-    event.stopPropagation();
-  }
-
-  return <div className={className} onClick={handleClick}></div>;
+  return className;
 }
 
 /**
@@ -494,7 +527,8 @@ function pawnMoves(
       case '1':
         // start move
         if (rank !== 1 && rank !== 6) continue;
-        else if (moves.length === 0) continue; // if the first move is blocked, the second move is also blocked
+        // if the first move is blocked, the second move is also blocked
+        else if (moves.length === 0) continue;
         else if (squares[newFile][newRank].piece.colour !== Colour.None) {
           continue;
         }

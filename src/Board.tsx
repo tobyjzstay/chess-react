@@ -1,7 +1,7 @@
 import React from 'react';
 import './Board.css';
 import {PieceData, Position, Type} from './Piece';
-import Square, {SquareData} from './Square';
+import Square, {SquareData, SquarePromotion} from './Square';
 
 export enum Colour {
   None = 0,
@@ -26,9 +26,13 @@ export type BoardData = {
   setEnPassant: (value: Position | null) => void;
   halfMove: number;
   fullMove: number;
+  promote: (square: SquareData, piece: PieceData) => void;
 };
 
 export const BoardContext = React.createContext<BoardData>(Object.create(null));
+export const PromotionContext = React.createContext<
+  [SquareData | null, React.Dispatch<React.SetStateAction<SquareData | null>>]
+>([null, () => undefined]);
 
 /**
  * Board component
@@ -54,6 +58,8 @@ function Board({
     boardData.enPassant
   );
 
+  const [promotion, setPromotion] = React.useState<SquareData | null>(null);
+
   boardData.turn = turn;
   boardData.setTurn = setTurn;
 
@@ -63,34 +69,61 @@ function Board({
   boardData.enPassant = enPassant;
   boardData.setEnPassant = setEnPassant;
 
+  boardData.promote = (square: SquareData, piece: PieceData) => {
+    const {file, rank} = square;
+    const squares = boardData.squares;
+    squares[rank][file].piece = piece;
+    setPromotion(null);
+  };
+
   console.log(boardToString(boardData, files, ranks));
 
   return (
     <BoardContext.Provider value={boardData}>
-      <div className="board">
-        {/* <div className="board promotion">
-          <div className="square promotion">
-            <div className="piece promotion white queen" />
-          </div>
-          <div className="square promotion">
-            <div className="piece promotion white knight" />
-          </div>
-          <div className="square promotion">
-            <div className="piece promotion white rook" />
-          </div>
-          <div className="square promotion">
-            <div className="piece promotion white bishop" />
-          </div>
-        </div> */}
-        {Array.from({length: boardData.ranks}, (_, rank) => (
-          <div key={rank} className="rank">
-            {Array.from({length: boardData.files}, (_, file) => (
-              <Square key={file} file={file} rank={rank} />
-            ))}
-          </div>
-        ))}
-      </div>
+      <PromotionContext.Provider value={[promotion, setPromotion]}>
+        <div className="board">
+          {Array.from({length: boardData.ranks}, (_, rank) => (
+            <div key={rank} className="rank">
+              {Array.from({length: boardData.files}, (_, file) => (
+                <Square key={file} file={file} rank={rank} />
+              ))}
+            </div>
+          ))}
+          <BoardPromotion />
+        </div>
+      </PromotionContext.Provider>
     </BoardContext.Provider>
+  );
+}
+
+/**
+ * Board promotion component
+ * @return {JSX.Element | null} Board promotion
+ */
+function BoardPromotion(): JSX.Element | null {
+  const [promotion] = React.useContext(PromotionContext);
+  if (!promotion) return null;
+  const colour = promotion.piece.colour;
+
+  let className = 'board promotion';
+  switch (colour) {
+    case Colour.White:
+      className += ' white';
+      break;
+    case Colour.Black:
+      className += ' black';
+      break;
+    default:
+      break;
+  }
+
+  return (
+    <div className={className}>
+      <SquarePromotion promotionPiece={{colour: colour, type: Type.Queen}} />
+      <SquarePromotion promotionPiece={{colour: colour, type: Type.Knight}} />
+      <SquarePromotion promotionPiece={{colour: colour, type: Type.Rook}} />
+      <SquarePromotion promotionPiece={{colour: colour, type: Type.Bishop}} />
+    </div>
   );
 }
 
@@ -146,6 +179,7 @@ function parseFen(fen: string, files: number, ranks: number): BoardData {
     setEnPassant: () => undefined,
     halfMove: parseHalfMove(halfMove),
     fullMove: parseFullMove(fullMove),
+    promote: () => undefined,
   };
 }
 
