@@ -76,7 +76,11 @@ function Board({
     setPromotion(null);
   };
 
-  console.log(boardToString(boardData, files, ranks));
+  React.useEffect(() => {
+    if (promotion !== null) return;
+    console.log(boardToString(boardData));
+    console.log(boardToFen(boardData));
+  }, [JSON.stringify(boardData)]);
 
   return (
     <BoardContext.Provider value={boardData}>
@@ -130,16 +134,10 @@ function BoardPromotion(): JSX.Element | null {
 /**
  * Get the board as a string
  * @param {BoardData} boardData The board data
- * @param {number} files The number of files
- * @param {number} ranks The number of ranks
  * @return {string} The board as a string
  */
-function boardToString(
-  boardData: BoardData,
-  files: number,
-  ranks: number
-): string {
-  const {squares} = boardData;
+function boardToString(boardData: BoardData): string {
+  const {squares, files, ranks} = boardData;
 
   let board = '';
   for (let rank = 0; rank < ranks; rank++) {
@@ -154,6 +152,60 @@ function boardToString(
   }
 
   return board;
+}
+
+function boardToFen(boardData: BoardData) {
+  const {squares, turn, castling, enPassant, halfMove, fullMove, files, ranks} =
+    boardData;
+
+  let fen = '';
+  for (let rank = 0; rank < ranks; rank++) {
+    let empty = 0;
+    for (let file = 0; file < files; file++) {
+      const piece = squares[file][rank].piece;
+      if (piece.type === Type.None) empty++;
+      else {
+        if (empty > 0) fen += empty;
+        empty = 0;
+        if (piece.colour === Colour.White) {
+          fen += piece.type.toUpperCase();
+        } else fen += piece.type;
+      }
+    }
+    if (empty > 0) fen += empty;
+    if (rank < ranks - 1) fen += '/';
+  }
+
+  switch (turn) {
+    case Colour.White:
+      fen += ' w';
+      break;
+    case Colour.Black:
+      fen += ' b';
+      break;
+    default:
+      break;
+  }
+
+  fen += ' ';
+  castling.forEach(castle => {
+    if (castle.colour === Colour.None) fen += '-';
+    fen +=
+      castle.colour === Colour.White
+        ? castle.type.toUpperCase()
+        : castle.type.toLowerCase();
+  });
+
+  if (enPassant === null) fen += ' -';
+  else {
+    fen += ' ' + String.fromCharCode('a'.charCodeAt(0) + enPassant[0]);
+    fen += ranks - enPassant[1];
+  }
+
+  fen += ' ' + halfMove;
+  fen += ' ' + fullMove;
+
+  return fen;
 }
 
 /**
