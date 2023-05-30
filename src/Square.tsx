@@ -217,9 +217,11 @@ function movePiece(
   }
 
   // change turn
-  boardData.setTurn(
-    boardData.turn === Colour.White ? Colour.Black : Colour.White
-  );
+  // boardData.setTurn(
+  //   boardData.turn === Colour.White ? Colour.Black : Colour.White
+  // );
+
+  boardData.incrementTurn(squares[file][rank].piece.type === Type.Pawn);
 }
 
 /**

@@ -27,6 +27,7 @@ export type BoardData = {
   halfMove: number;
   fullMove: number;
   promote: (square: SquareData, piece: PieceData) => void;
+  incrementTurn: (pawnMove: boolean) => void;
 };
 
 export const BoardContext = React.createContext<BoardData>(Object.create(null));
@@ -75,6 +76,15 @@ function Board({
     squares[rank][file].piece = piece;
     setPromotion(null);
   };
+
+  function incrementTurn(pawnMove: boolean) {
+    if (turn === Colour.Black) boardData.fullMove++;
+    if (pawnMove) boardData.halfMove = 0;
+    else boardData.halfMove++;
+    setTurn(turn === Colour.White ? Colour.Black : Colour.White);
+  }
+
+  boardData.incrementTurn = incrementTurn;
 
   React.useEffect(() => {
     if (promotion !== null) return;
@@ -232,6 +242,7 @@ function parseFen(fen: string, files: number, ranks: number): BoardData {
     halfMove: parseHalfMove(halfMove),
     fullMove: parseFullMove(fullMove),
     promote: () => undefined,
+    incrementTurn: () => undefined,
   };
 }
 
