@@ -98,9 +98,9 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
     <SquareContext.Provider value={{file, rank}}>
       <div className={squareClassName} onClick={handleClick}>
         <div className={overlayClassName}>
-          {/* <p className="coord debug">
+          <p className="coord debug">
             {'[file:' + file + ', rank:' + rank + ']'}
-          </p> */}
+          </p>
           {ranks - 1 === rank && (
             <p className="coord file">
               {String.fromCharCode('a'.charCodeAt(0) + file)}
@@ -217,10 +217,6 @@ function movePiece(
   }
 
   // change turn
-  // boardData.setTurn(
-  //   boardData.turn === Colour.White ? Colour.Black : Colour.White
-  // );
-
   boardData.incrementTurn(squares[file][rank].piece.type === Type.Pawn);
 }
 

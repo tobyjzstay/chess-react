@@ -46,7 +46,7 @@ function Piece(): JSX.Element | null {
     if (piece.colour !== turn) return;
     const isSelected = square.isSelected;
     square.setSelected(!isSelected);
-    const moves = legalMoves(boardData, file, rank, false);
+    const moves = legalMoves(boardData, file, rank, false, turn);
     moves.forEach(([file, rank]) => {
       squares[file][rank].setDestination(!isSelected);
     });
@@ -130,14 +130,16 @@ function getPieceClassName(piece: PieceData, prefix: string): string | null {
  * @param {boolean} pseudo Whether to check for pseudo-legal moves
  * @return {Position[]} The legal moves
  */
-function legalMoves(
+export function legalMoves(
   boardData: BoardData,
   file: number,
   rank: number,
-  pseudo: boolean
+  pseudo: boolean,
+  colour: Colour
 ): Position[] {
   const {squares} = boardData;
   const piece = squares[file][rank].piece;
+  if (piece.colour !== colour) return [];
   switch (piece.type) {
     case Type.King:
       return kingMoves(boardData, file, rank, pseudo);
@@ -290,7 +292,7 @@ export function isSquareAttacked(
       if (f === file && r === rank) continue; // ignore the square itself
       const piece = squares[f][r].piece;
       if (piece.colour === colour) continue; // ignore pieces of the same colour
-      const moves = legalMoves(boardData, f, r, true);
+      const moves = legalMoves(boardData, f, r, true, piece.colour);
       for (const move of moves) {
         // check if the square is attacked by the piece
         if (move[0] === file && move[1] === rank) return true;

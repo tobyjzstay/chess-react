@@ -1,6 +1,6 @@
 import React from 'react';
 import './Board.css';
-import {PieceData, Position, Type} from './Piece';
+import {PieceData, Position, Type, isSquareAttacked, legalMoves} from './Piece';
 import Square, {SquareData, SquarePromotion} from './Square';
 
 export enum Colour {
@@ -81,7 +81,29 @@ function Board({
     if (turn === Colour.Black) boardData.fullMove++;
     if (pawnMove) boardData.halfMove = 0;
     else boardData.halfMove++;
-    setTurn(turn === Colour.White ? Colour.Black : Colour.White);
+    const nextTurn = turn === Colour.White ? Colour.Black : Colour.White;
+    setTurn(nextTurn);
+    let inCheck = false;
+    let hasMoves = false;
+
+    for (let r = 0; r < boardData.ranks; r++) {
+      if (hasMoves) break;
+      for (let f = 0; f < boardData.files; f++) {
+        const {file, rank} = boardData.squares[f][r];
+        if (legalMoves(boardData, file, rank, false, nextTurn).length > 0) {
+          hasMoves = true;
+          break;
+        }
+        if (isSquareAttacked(boardData, file, rank, nextTurn)) {
+          inCheck = true;
+        }
+      }
+    }
+
+    if (!hasMoves) {
+      if (inCheck) alert('Checkmate');
+      else alert('Stalemate');
+    }
   }
 
   boardData.incrementTurn = incrementTurn;
