@@ -29,6 +29,7 @@
   font-size: calc(8px + 4 * ((100vw - 320px) / 880));
   font-weight: bold;
   user-select: none;
+  pointer-events: none;
 }
 
 .coord.file {
