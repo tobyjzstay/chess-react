@@ -51,6 +51,9 @@ function Board({
 }): JSX.Element {
   const boardData = React.useMemo(() => parseFen(fen, files, ranks), []);
 
+  // force update
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+
   const [turn, setTurn] = React.useState<Colour>(boardData.turn);
   const [castling, setCastling] = React.useState<Castling[]>(
     boardData.castling
@@ -77,32 +80,44 @@ function Board({
     setPromotion(null);
   };
 
-  function incrementTurn(pawnMove: boolean) {
+  /**
+   * Increment turn
+   * @param {boolean} pawnMove Whether a pawn was moved
+   * @return {void}
+   */
+  function incrementTurn(pawnMove: boolean): void {
     if (turn === Colour.Black) boardData.fullMove++;
     if (pawnMove) boardData.halfMove = 0;
     else boardData.halfMove++;
     const nextTurn = turn === Colour.White ? Colour.Black : Colour.White;
     setTurn(nextTurn);
+    forceUpdate();
+
+    // check if the game is over
     let inCheck = false;
     let hasMoves = false;
-
     for (let r = 0; r < boardData.ranks; r++) {
       if (hasMoves) break;
       for (let f = 0; f < boardData.files; f++) {
-        const {file, rank} = boardData.squares[f][r];
+        const {file: _file, rank: _rank, piece} = boardData.squares[f][r];
+        // TODO: fix this
+        const file = _rank;
+        const rank = _file;
+        if (piece.type === Type.King && piece.colour === nextTurn)
+          if (isSquareAttacked(boardData, file, rank, nextTurn)) {
+            inCheck = true;
+          }
         if (legalMoves(boardData, file, rank, false, nextTurn).length > 0) {
           hasMoves = true;
           break;
         }
-        if (isSquareAttacked(boardData, file, rank, nextTurn)) {
-          inCheck = true;
-        }
       }
     }
-
     if (!hasMoves) {
-      if (inCheck) alert('Checkmate');
-      else alert('Stalemate');
+      setTimeout(() => {
+        if (inCheck) alert('Checkmate');
+        else alert('Stalemate');
+      }, 0);
     }
   }
 
