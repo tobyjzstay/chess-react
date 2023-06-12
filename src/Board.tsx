@@ -99,10 +99,7 @@ function Board({
     for (let r = 0; r < boardData.ranks; r++) {
       if (hasMoves) break;
       for (let f = 0; f < boardData.files; f++) {
-        const {file: _file, rank: _rank, piece} = boardData.squares[f][r];
-        // TODO: fix this
-        const file = _rank;
-        const rank = _file;
+        const {file, rank, piece} = boardData.squares[r][f];
         if (piece.type === Type.King && piece.colour === nextTurn)
           if (isSquareAttacked(boardData, file, rank, nextTurn)) {
             inCheck = true;
@@ -189,8 +186,8 @@ function boardToString(boardData: BoardData): string {
   let board = '';
   for (let rank = 0; rank < ranks; rank++) {
     for (let file = 0; file < files; file++) {
-      const piece = squares[file][rank].piece;
-      if (piece.type === Type.None) board += piece.type;
+      const piece = squares[rank][file].piece;
+      if (piece.type === Type.None) board += piece.type.toLowerCase();
       else if (piece.colour === Colour.White) {
         board += piece.type.toUpperCase();
       } else board += piece.type;
@@ -209,7 +206,7 @@ function boardToFen(boardData: BoardData) {
   for (let rank = 0; rank < ranks; rank++) {
     let empty = 0;
     for (let file = 0; file < files; file++) {
-      const piece = squares[file][rank].piece;
+      const piece = squares[rank][file].piece;
       if (piece.type === Type.None) empty++;
       else {
         if (empty > 0) fen += empty;
@@ -235,18 +232,19 @@ function boardToFen(boardData: BoardData) {
   }
 
   fen += ' ';
-  castling.forEach(castle => {
-    if (castle.colour === Colour.None) fen += '-';
-    fen +=
-      castle.colour === Colour.White
-        ? castle.type.toUpperCase()
-        : castle.type.toLowerCase();
-  });
+  if (castling.length === 0) fen += '-';
+  else
+    castling.forEach(castle => {
+      fen +=
+        castle.colour === Colour.White
+          ? castle.type.toUpperCase()
+          : castle.type.toLowerCase();
+    });
 
   if (enPassant === null) fen += ' -';
   else {
     fen += ' ' + String.fromCharCode('a'.charCodeAt(0) + enPassant[0]);
-    fen += ranks - enPassant[1];
+    fen += files - enPassant[1];
   }
 
   fen += ' ' + halfMove;
@@ -307,7 +305,7 @@ function parsePieceData(
       row.push({
         file,
         rank,
-        piece: pieces[file][rank],
+        piece: pieces[rank][file],
       } as SquareData);
     }
     squares.push(row);

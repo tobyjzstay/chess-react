@@ -32,23 +32,23 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
   const boardData = React.useContext(BoardContext);
   const [, setPromotion] = React.useContext(PromotionContext);
   const {files, ranks, squares, turn} = boardData;
-  const piece = squares[file][rank].piece;
+  const piece = squares[rank][file].piece;
 
   const [destination, setDestination] = React.useState(false);
   const [selected, setSelected] = React.useState(false);
 
-  squares[file][rank].isDestination = destination;
-  squares[file][rank].setDestination = setDestination;
+  squares[rank][file].isDestination = destination;
+  squares[rank][file].setDestination = setDestination;
 
-  squares[file][rank].isSelected = selected;
-  squares[file][rank].setSelected = (value: boolean) => {
+  squares[rank][file].isSelected = selected;
+  squares[rank][file].setSelected = (value: boolean) => {
     if (value)
       // clear all other selected squares
       for (let r = 0; r < ranks; r++) {
         for (let f = 0; f < files; f++) {
           if (f === file && r === rank) continue;
-          squares[f][r].setSelected(false);
-          squares[f][r].setDestination(false);
+          squares[r][f].setSelected(false);
+          squares[r][f].setDestination(false);
         }
       }
     setSelected(value);
@@ -87,8 +87,8 @@ function Square({file, rank}: {file: number; rank: number}): JSX.Element {
     if (destination) movePiece(boardData, file, rank, setPromotion);
     for (let rank = 0; rank < ranks; rank++) {
       for (let file = 0; file < files; file++) {
-        squares[file][rank].setSelected(false);
-        squares[file][rank].setDestination(false);
+        squares[rank][file].setSelected(false);
+        squares[rank][file].setDestination(false);
       }
     }
     event.stopPropagation();
@@ -149,52 +149,52 @@ function movePiece(
   if (!selected) return;
 
   // move piece
-  squares[file][rank].piece = selected.piece;
+  squares[rank][file].piece = selected.piece;
   selected.piece = {type: Type.None, colour: Colour.None};
 
   boardData.setEnPassant(null);
 
   // handle special moves
-  switch (squares[file][rank].piece.type) {
+  switch (squares[rank][file].piece.type) {
     case Type.Pawn:
-      if (Math.abs(selected.file - rank) === 2)
+      if (Math.abs(selected.rank - rank) === 2) {
         // add en passant
-        boardData.setEnPassant([file, rank + (selected.file - rank) / 2]);
-      else if (
+        boardData.setEnPassant([file, rank + (selected.rank - rank) / 2]);
+      } else if (
         boardData.enPassant !== null &&
         file === boardData.enPassant[0] &&
         rank === boardData.enPassant[1]
       ) {
         // en passant
-        squares[file][
-          rank + (squares[file][rank].piece.colour === Colour.White ? 1 : -1)
-        ].piece = {type: Type.None, colour: Colour.None};
+        squares[
+          rank + (squares[rank][file].piece.colour === Colour.White ? 1 : -1)
+        ][file].piece = {type: Type.None, colour: Colour.None};
       } else if (rank === 0 || rank === ranks - 1)
         // promotion
-        setPromotion(squares[file][rank]);
+        setPromotion(squares[rank][file]);
       break;
     case Type.King:
       // remove castling rights
       boardData.setCastling(
         boardData.castling.filter(
-          castling => castling.colour !== squares[file][rank].piece.colour
+          castling => castling.colour !== squares[rank][file].piece.colour
         )
       );
       // castling
       // eslint-disable-next-line no-case-declarations
-      const dx = file - selected.rank;
+      const dx = file - selected.file;
       if (Math.abs(dx) === 2) {
         if (dx > 0) {
           // kingside
-          squares[file - 1][rank].piece = squares[files - 1][rank].piece;
-          squares[files - 1][rank].piece = {
+          squares[rank][file - 1].piece = squares[rank][files - 1].piece;
+          squares[rank][files - 1].piece = {
             type: Type.None,
             colour: Colour.None,
           };
         } else {
           // queenside
-          squares[file + 1][rank].piece = squares[0][rank].piece;
-          squares[0][rank].piece = {
+          squares[rank][file + 1].piece = squares[rank][0].piece;
+          squares[rank][0].piece = {
             type: Type.None,
             colour: Colour.None,
           };
@@ -206,7 +206,7 @@ function movePiece(
       boardData.setCastling(
         boardData.castling.filter(
           castling =>
-            castling.colour !== squares[file][rank].piece.colour ||
+            castling.colour !== squares[rank][file].piece.colour ||
             (file !== 0 && castling.type === Type.Queen) ||
             (file !== files - 1 && castling.type === Type.King)
         )
@@ -217,7 +217,7 @@ function movePiece(
   }
 
   // change turn
-  boardData.incrementTurn(squares[file][rank].piece.type === Type.Pawn);
+  boardData.incrementTurn(squares[rank][file].piece.type === Type.Pawn);
 }
 
 /**
@@ -234,7 +234,7 @@ function getSelected(
 ): SquareData | null {
   for (let rank = 0; rank < ranks; rank++) {
     for (let file = 0; file < files; file++) {
-      if (squares[file][rank].isSelected) return squares[file][rank];
+      if (squares[rank][file].isSelected) return squares[rank][file];
     }
   }
   return null;

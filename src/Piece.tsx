@@ -29,7 +29,7 @@ function Piece(): JSX.Element | null {
   const {squares, turn} = boardData;
   const {file, rank} = React.useContext(SquareContext);
 
-  const square = squares[file][rank];
+  const square = squares[rank][file];
   const piece = square.piece;
 
   const className = getPieceClassName(piece, 'piece');
@@ -48,7 +48,7 @@ function Piece(): JSX.Element | null {
     square.setSelected(!isSelected);
     const moves = legalMoves(boardData, file, rank, false, turn);
     moves.forEach(([file, rank]) => {
-      squares[file][rank].setDestination(!isSelected);
+      squares[rank][file].setDestination(!isSelected);
     });
     event.stopPropagation();
   }
@@ -138,7 +138,7 @@ export function legalMoves(
   colour: Colour
 ): Position[] {
   const {squares} = boardData;
-  const piece = squares[file][rank].piece;
+  const piece = squares[rank][file].piece;
   if (piece.colour !== colour) return [];
   switch (piece.type) {
     case Type.King:
@@ -175,14 +175,14 @@ function kingMoves(
   pseudo: boolean
 ): Position[] {
   const {files, ranks, squares, castling} = boardData;
-  const piece = squares[file][rank].piece;
+  const piece = squares[rank][file].piece;
   const moves: Position[] = [];
 
   for (const move of KING_DIRECTIONS) {
     const newFile = file + move[0];
     const newRank = rank + move[1];
     if (!(newFile < 0 || newFile >= files || newRank < 0 || newRank >= ranks)) {
-      if (squares[newFile][newRank].piece.colour === piece.colour) {
+      if (squares[newRank][newFile].piece.colour === piece.colour) {
         continue;
       } else if (
         !pseudo &&
@@ -198,7 +198,7 @@ function kingMoves(
     for (const castle of castling) {
       if (castle.colour !== piece.colour) continue;
 
-      const rankPieces = squares.map(fileSquares => fileSquares[rank].piece);
+      const rankPieces = squares[rank].map(square => square.piece);
 
       switch (castle.type) {
         case Type.Queen:
@@ -256,16 +256,15 @@ function isIllegalMove(
   const _boardData = JSON.parse(JSON.stringify(boardData)) as BoardData;
   const {files, ranks, squares} = _boardData;
 
-  squares[file][rank].piece = {type: Type.None, colour: Colour.None};
-  squares[newFile][newRank].piece = piece;
+  squares[rank][file].piece = {type: Type.None, colour: Colour.None};
+  squares[newRank][newFile].piece = piece;
 
   // check if the king is in check
   for (let r = 0; r < ranks; r++) {
     for (let f = 0; f < files; f++) {
-      const p = squares[f][r].piece;
-      if (p.colour === piece.colour && p.type === Type.King) {
+      const p = squares[r][f].piece;
+      if (p.colour === piece.colour && p.type === Type.King)
         if (isSquareAttacked(_boardData, f, r, p.colour)) return true;
-      }
     }
   }
 
@@ -290,7 +289,7 @@ export function isSquareAttacked(
   for (let r = 0; r < ranks; r++) {
     for (let f = 0; f < files; f++) {
       if (f === file && r === rank) continue; // ignore the square itself
-      const piece = squares[f][r].piece;
+      const piece = squares[r][f].piece;
       if (piece.colour === colour) continue; // ignore pieces of the same colour
       const moves = legalMoves(boardData, f, r, true, piece.colour);
       for (const move of moves) {
@@ -318,7 +317,7 @@ function queenMoves(
   pseudo: boolean
 ): Position[] {
   const {squares, files, ranks} = boardData;
-  const piece = squares[file][rank].piece;
+  const piece = squares[rank][file].piece;
   const moves: Position[] = [];
 
   for (const move of QUEEN_DIRECTIONS) {
@@ -328,7 +327,7 @@ function queenMoves(
     while (
       !(newFile < 0 || newFile >= files || newRank < 0 || newRank >= ranks)
     ) {
-      if (squares[newFile][newRank].piece.colour === piece.colour) break;
+      if (squares[newRank][newFile].piece.colour === piece.colour) break;
       else if (
         !pseudo &&
         isIllegalMove(boardData, file, rank, piece, newFile, newRank)
@@ -338,7 +337,7 @@ function queenMoves(
         continue;
       }
       moves.push([newFile, newRank]);
-      if (squares[newFile][newRank].piece.colour !== Colour.None) break;
+      if (squares[newRank][newFile].piece.colour !== Colour.None) break;
       // move to the next square
       newFile += move[0];
       newRank += move[1];
@@ -363,7 +362,7 @@ function rookMoves(
   pseudo: boolean
 ): Position[] {
   const {files, ranks, squares} = boardData;
-  const piece = squares[file][rank].piece;
+  const piece = squares[rank][file].piece;
   const moves: Position[] = [];
 
   for (const move of ROOK_DIRECTIONS) {
@@ -373,7 +372,7 @@ function rookMoves(
     while (
       !(newFile < 0 || newFile >= files || newRank < 0 || newRank >= ranks)
     ) {
-      if (squares[newFile][newRank].piece.colour === piece.colour) break;
+      if (squares[newRank][newFile].piece.colour === piece.colour) break;
       else if (
         !pseudo &&
         isIllegalMove(boardData, file, rank, piece, newFile, newRank)
@@ -383,7 +382,7 @@ function rookMoves(
         continue;
       }
       moves.push([newFile, newRank]);
-      if (squares[newFile][newRank].piece.colour !== Colour.None) break;
+      if (squares[newRank][newFile].piece.colour !== Colour.None) break;
       // move to the next square
       newFile += move[0];
       newRank += move[1];
@@ -408,7 +407,7 @@ function bishopMoves(
   pseudo: boolean
 ): Position[] {
   const {files, ranks, squares} = boardData;
-  const piece = squares[file][rank].piece;
+  const piece = squares[rank][file].piece;
   const moves: Position[] = [];
 
   for (const move of BISHOP_DIRECTIONS) {
@@ -418,7 +417,7 @@ function bishopMoves(
     while (
       !(newFile < 0 || newFile >= files || newRank < 0 || newRank >= ranks)
     ) {
-      if (squares[newFile][newRank].piece.colour === piece.colour) break;
+      if (squares[newRank][newFile].piece.colour === piece.colour) break;
       else if (
         !pseudo &&
         isIllegalMove(boardData, file, rank, piece, newFile, newRank)
@@ -428,7 +427,7 @@ function bishopMoves(
         continue;
       }
       moves.push([newFile, newRank]);
-      if (squares[newFile][newRank].piece.colour !== Colour.None) break;
+      if (squares[newRank][newFile].piece.colour !== Colour.None) break;
       // move to the next square
       newFile += move[0];
       newRank += move[1];
@@ -453,7 +452,7 @@ function knightMoves(
   pseudo: boolean
 ): Position[] {
   const {files, ranks, squares} = boardData;
-  const piece = squares[file][rank].piece;
+  const piece = squares[rank][file].piece;
   const moves: Position[] = [];
 
   for (const move of KNIGHT_DIRECTIONS) {
@@ -461,7 +460,7 @@ function knightMoves(
     const newRank = rank + move[1];
     if (newFile < 0 || newFile >= files || newRank < 0 || newRank >= ranks) {
       continue;
-    } else if (squares[newFile][newRank].piece.colour === piece.colour) {
+    } else if (squares[newRank][newFile].piece.colour === piece.colour) {
       continue;
     } else if (
       !pseudo &&
@@ -489,7 +488,7 @@ function pawnMoves(
   pseudo: boolean
 ): Position[] {
   const {files, ranks, squares, enPassant} = boardData;
-  const piece = squares[file][rank].piece;
+  const piece = squares[rank][file].piece;
   const moves: Position[] = [];
 
   let direction;
@@ -522,7 +521,7 @@ function pawnMoves(
     switch (index) {
       case '0':
         // move
-        if (squares[newFile][newRank].piece.colour !== Colour.None) {
+        if (squares[newRank][newFile].piece.colour !== Colour.None) {
           continue;
         }
         break;
@@ -531,7 +530,7 @@ function pawnMoves(
         if (rank !== 1 && rank !== 6) continue;
         // if the first move is blocked, the second move is also blocked
         else if (moves.length === 0) continue;
-        else if (squares[newFile][newRank].piece.colour !== Colour.None) {
+        else if (squares[newRank][newFile].piece.colour !== Colour.None) {
           continue;
         }
         break;
@@ -539,7 +538,7 @@ function pawnMoves(
       case '3':
         // capture
         // eslint-disable-next-line no-case-declarations
-        const colour = squares[newFile][newRank].piece.colour;
+        const colour = squares[newRank][newFile].piece.colour;
         if (colour === piece.colour) continue;
         if (colour === Colour.None) {
           if (enPassant === null) continue;
@@ -553,7 +552,7 @@ function pawnMoves(
         break;
     }
 
-    if (squares[newFile][newRank].piece.colour === piece.colour) continue;
+    if (squares[newRank][newFile].piece.colour === piece.colour) continue;
     else if (
       !pseudo &&
       isIllegalMove(boardData, file, rank, piece, newFile, newRank)
