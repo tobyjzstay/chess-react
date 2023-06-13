@@ -148,9 +148,22 @@ function movePiece(
   const selected = getSelected(files, ranks, squares);
   if (!selected) return;
 
-  // move piece
-  squares[rank][file].piece = selected.piece;
-  selected.piece = {type: Type.None, colour: Colour.None};
+  if (squares[rank][file].piece.colour === selected.piece.colour) {
+    // attempting to 'capture' own piece (castling)
+    if (squares[rank][file].piece.type !== Type.Rook) return;
+    const direction = file < selected.file ? -2 : 2;
+    movePiece(
+      boardData,
+      selected.file + direction,
+      selected.rank,
+      setPromotion
+    );
+    return;
+  } else {
+    // move piece
+    squares[rank][file].piece = selected.piece;
+    selected.piece = {type: Type.None, colour: Colour.None};
+  }
 
   boardData.setEnPassant(null);
 

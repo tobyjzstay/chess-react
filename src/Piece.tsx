@@ -45,6 +45,7 @@ function Piece(): JSX.Element | null {
   ): void {
     if (piece.colour !== turn) return;
     const isSelected = square.isSelected;
+    if (square.isDestination) return; // castling
     square.setSelected(!isSelected);
     const moves = legalMoves(boardData, file, rank, false, turn);
     moves.forEach(([file, rank]) => {
