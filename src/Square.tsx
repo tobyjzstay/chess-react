@@ -124,8 +124,18 @@ export function SquarePromotion({
 }: {
   promotionPiece: PieceData;
 }): JSX.Element {
+  const [ref, setRef] = React.useState<HTMLDivElement | null>(null);
+  const [promotion] = React.useContext(PromotionContext);
+
+  React.useEffect(() => {
+    if (!ref || !promotion) return;
+    const sqaure = ref?.getBoundingClientRect();
+    const size = sqaure?.width || 0;
+    ref?.style.setProperty('left', promotion.file * size + 'px');
+  }, [ref, promotion]);
+
   return (
-    <div className="square promotion">
+    <div className="square promotion" ref={setRef}>
       <PiecePromotion promotionPiece={promotionPiece} />
     </div>
   );
